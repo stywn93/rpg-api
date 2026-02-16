@@ -18,7 +18,6 @@ class UserModel extends Model
         'phone',
         'password',
         'role',
-        'status',
     ];
 
     // Timestamp
