@@ -1,0 +1,36 @@
+services:
+  codeigniter4:
+    image: shinsenter/codeigniter4:latest
+    container_name: rpg-api
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+    volumes:
+      - .:/var/www/html
+    restart: unless-stopped
+    networks:
+      - rpg-api-network
+
+  db:
+    image: mysql:8.0
+    container_name: rpg-api-db
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: db
+      MYSQL_USER: user
+      MYSQL_PASSWORD: pass
+    volumes:
+      - db_data:/var/lib/mysql
+    ports:
+      - "3306:3306"
+    restart: no
+    networks:
+      - rpg-api-network
+
+volumes:
+ db_data:
+
+networks:
+ rpg-api-network:
+  driver: bridge
