@@ -10,7 +10,7 @@ class UserModel extends Model
     protected $primaryKey = 'id';
     protected $useAutoIncrement = true;
     protected $returnType = 'array';
-    protected $useSoftDeletes = false;
+    protected $useSoftDeletes = true;
 
     protected $allowedFields = [
         'name',
@@ -25,6 +25,7 @@ class UserModel extends Model
     protected $dateFormat = 'datetime';
     protected $createdField = 'created_at';
     protected $updatedField = 'updated_at';
+    protected $deletedField = 'deleted_at';
 
     // Validation (opsional tapi recommended)
     protected $validationRules = [
