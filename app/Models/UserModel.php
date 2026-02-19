@@ -18,6 +18,7 @@ class UserModel extends Model
         'phone',
         'password',
         'role',
+        'status'
     ];
 
     // Timestamp
@@ -33,7 +34,7 @@ class UserModel extends Model
         'email' => 'required|valid_email|is_unique[users.email,id,{id}]',
         'password' => 'required|min_length[6]',
         'role' => 'required|in_list[parent,petugas,admin,pimpinan]',
-        'status' => 'required|in_list[active,suspended]',
+
     ];
 
     protected $validationMessages = [];

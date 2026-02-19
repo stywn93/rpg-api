@@ -93,6 +93,50 @@ final class UserServiceTest extends CIUnitTestCase
         $this->assertSame(['id' => 7], $result);
     }
 
+    public function testCreateReturnsErrorWhenInsertFails(): void
+    {
+        $service = new UserService();
+
+        $userModel = $this->getMockBuilder(UserModel::class)
+            ->disableOriginalConstructor()
+            ->onlyMethods(['insert', 'errors', 'getInsertID', 'find'])
+            ->getMock();
+
+        $plainPassword = 'secret123';
+        $validationErrors = ['email' => 'Email already exists'];
+
+        $userModel->expects($this->once())
+            ->method('insert')
+            ->with($this->callback(function ($data) use ($plainPassword) {
+                return isset($data['password'])
+                    && $data['password'] !== $plainPassword
+                    && password_verify($plainPassword, $data['password']);
+            }))
+            ->willReturn(false);
+
+        $userModel->expects($this->once())
+            ->method('errors')
+            ->willReturn($validationErrors);
+
+        $userModel->expects($this->never())
+            ->method('getInsertID');
+
+        $userModel->expects($this->never())
+            ->method('find');
+
+        $this->setPrivateProperty($service, 'userModel', $userModel);
+
+        $result = $service->create([
+            'name' => 'Test User',
+            'email' => 'existing@example.com',
+            'password' => $plainPassword,
+            'role' => 'admin',
+            'status' => 'active',
+        ]);
+
+        $this->assertSame(['error' => $validationErrors], $result);
+    }
+
     public function testUpdateHashesPasswordWhenProvided(): void
     {
         $service = new UserService();

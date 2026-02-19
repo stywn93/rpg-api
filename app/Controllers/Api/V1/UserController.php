@@ -39,11 +39,14 @@ class UserController extends ResourceController
 
     public function create(){
         $data = $this->request->getJSON(true);
-        $user = $this->userService->create($data);
+        $insert = $this->userService->create($data);
+        if (isset($insert['error'])) {
+            return $this->failValidationErrors($insert['error']);
+        }
         return $this->respondCreated([
             'status' => 'success',
             'message' => 'User created successfully',
-            'data' => $data,
+            'data' => $insert,
             'errors' => null
         ]);
     }

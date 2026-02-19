@@ -20,7 +20,10 @@ class UserService
 
     public function create($data){
         $data['password'] = password_hash($data['password'], PASSWORD_DEFAULT);
-        $this->userModel->insert($data);
+        $inserted = $this->userModel->insert($data);
+        if ($inserted === false) {
+            return ['error' => $this->userModel->errors()];
+        }
         return $this->userModel->find($this->userModel->getInsertID());
     }
 
