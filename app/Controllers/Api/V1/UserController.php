@@ -53,7 +53,8 @@ class UserController extends ResourceController
 
     public function update($id = null){
         $data = $this->request->getJSON(true);
-        $user = $this->userService->update($id, $data);
+
+//        $user = $this->userService->update($id, $data);
         return $this->respondUpdated([
             'status' => 'success',
             'message' => 'User updated successfully',
@@ -73,6 +74,7 @@ class UserController extends ResourceController
     }
 
     public function activate($id){
+        echo "halo";
         $this->userService->activate($id);
         return $this->respond([
             'status' => 'success',

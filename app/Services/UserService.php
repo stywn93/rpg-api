@@ -40,7 +40,11 @@ class UserService
     }
 
     public function activate($id){
-        $user = $this->userModel->update($id, ['status' => 'active']);
+        return "abcd";
+
+//        $user = $this->userModel->update($id, ['status' => 'active']);
+//        $db = \Config\Database::connect();
+//        echo $db->getLastQuery();
     }
 
     public function suspend($id){
