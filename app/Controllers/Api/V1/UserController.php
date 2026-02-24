@@ -73,13 +73,25 @@ class UserController extends ResourceController
         ]);
     }
 
-    public function activate($id){
-        echo "halo";
-        $this->userService->activate($id);
+    public function activate($id){ 
+        $result = $this->userService->activate($id);
+
+        if (isset($result['error'])) {
+            if (($result['code'] ?? 500) === 404) {
+                return $this->failNotFound($result['error']);
+            }
+
+            if (($result['code'] ?? 500) === 422) {
+                return $this->failValidationErrors($result['error']);
+            }
+
+            return $this->fail($result['error'], $result['code'] ?? 400);
+        }
+
         return $this->respond([
             'status' => 'success',
             'message' => 'User '. $id .' activated successfully',
-            'data' => $id,
+            'data' => $result['data'] ?? null,
             'errors' => null
         ]);
     }

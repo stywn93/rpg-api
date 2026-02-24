@@ -40,11 +40,34 @@ class UserService
     }
 
     public function activate($id){
-        return "abcd";
+        if (! is_numeric($id) || (int) $id <= 0) {
+            return [
+                'error' => 'ID not valid',
+                'code' => 400,
+            ];
+        }
 
-//        $user = $this->userModel->update($id, ['status' => 'active']);
-//        $db = \Config\Database::connect();
-//        echo $db->getLastQuery();
+        $id = (int) $id;
+        $user = $this->userModel->find($id);
+        if (! $user) {
+            return [
+                'error' => 'User not found',
+                'code' => 404,
+            ];
+        }
+
+        $updated = $this->userModel->update($id, ['status' => 'active']);
+        if ($updated === false) {
+            return [
+                'error' => $this->userModel->errors(),
+                'code' => 422,
+            ];
+        }
+
+        return [
+            'success' => true,
+            'data' => $this->userModel->find($id),
+        ];
     }
 
     public function suspend($id){

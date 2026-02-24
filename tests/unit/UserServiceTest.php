@@ -215,14 +215,75 @@ final class UserServiceTest extends CIUnitTestCase
         $this->assertTrue(true);
     }
 
-    public function testActivateUpdatesStatusToActive(): void
+    public function testActivateReturnsErrorWhenIdInvalid(): void
     {
         $service = new UserService();
 
         $userModel = $this->getMockBuilder(UserModel::class)
             ->disableOriginalConstructor()
-            ->onlyMethods(['update'])
+            ->onlyMethods(['find', 'update'])
             ->getMock();
+
+        $userModel->expects($this->never())
+            ->method('find');
+
+        $userModel->expects($this->never())
+            ->method('update')
+            ->with(3, ['status' => 'active']);
+
+        $this->setPrivateProperty($service, 'userModel', $userModel);
+
+        $result = $service->activate('abc');
+
+        $this->assertSame([
+            'error' => 'ID not valid',
+            'code' => 400,
+        ], $result);
+    }
+
+    public function testActivateReturnsErrorWhenUserNotFound(): void
+    {
+        $service = new UserService();
+
+        $userModel = $this->getMockBuilder(UserModel::class)
+            ->disableOriginalConstructor()
+            ->onlyMethods(['find', 'update'])
+            ->getMock();
+
+        $userModel->expects($this->once())
+            ->method('find')
+            ->with(3)
+            ->willReturn(null);
+
+        $userModel->expects($this->never())
+            ->method('update');
+
+        $this->setPrivateProperty($service, 'userModel', $userModel);
+
+        $result = $service->activate(3);
+
+        $this->assertSame([
+            'error' => 'User not found',
+            'code' => 404,
+        ], $result);
+    }
+
+    public function testActivateUpdatesStatusToActive(): void
+    {
+        $service = new UserService();
+
+        $existingUser = ['id' => 3, 'status' => 'suspended'];
+        $updatedUser = ['id' => 3, 'status' => 'active'];
+
+        $userModel = $this->getMockBuilder(UserModel::class)
+            ->disableOriginalConstructor()
+            ->onlyMethods(['find', 'update'])
+            ->getMock();
+
+        $userModel->expects($this->exactly(2))
+            ->method('find')
+            ->with(3)
+            ->willReturnOnConsecutiveCalls($existingUser, $updatedUser);
 
         $userModel->expects($this->once())
             ->method('update')
@@ -231,8 +292,12 @@ final class UserServiceTest extends CIUnitTestCase
 
         $this->setPrivateProperty($service, 'userModel', $userModel);
 
-        $service->activate(3);
-        $this->assertTrue(true);
+        $result = $service->activate(3);
+
+        $this->assertSame([
+            'success' => true,
+            'data' => $updatedUser,
+        ], $result);
     }
 
     public function testSuspendUpdatesStatusToSuspended(): void
