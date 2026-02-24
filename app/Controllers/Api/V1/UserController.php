@@ -57,7 +57,15 @@ class UserController extends ResourceController
         $user = $this->userService->update($id, $data);
 
         if (isset($user['error'])) {
+            if (($user['code'] ?? 500) === 404) {
+                return $this->failNotFound($user['error']);
+            }
+
             if (($user['code'] ?? 500) === 409) {
+                return $this->failValidationErrors($user['error']);
+            }
+
+            if (($user['code'] ?? 500) === 400) {
                 return $this->failValidationErrors($user['error']);
             }
         }

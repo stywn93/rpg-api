@@ -36,12 +36,21 @@ class UserService
         $user = $this->userModel->find($id);
 
         if(!$user){
-            return ['error' => $this->userModel->errors()];
+            return [
+                'error' => 'user not found',
+                'code' => 404
+            ];
         }
         if($this->userModel->where('email', $data['email'])->where('id !=', $id)->first()){
             return [
                 'error' => 'email already exists',
                 'code' => 409
+            ];
+        }
+        if(isset($data['status'])){
+            return [
+                'error' => 'wrong API to activate or suspend',
+                'code' => 400
             ];
         }
         $this->userModel->update($id, $data);
