@@ -32,7 +32,6 @@ class UserService
         if (isset($data['password'])) {
             $data['password'] = password_hash($data['password'], PASSWORD_DEFAULT);
         }
-        //harusnya cek di sini bukan by ID tapi by email
         $user = $this->userModel->find($id);
 
         if(!$user){
@@ -59,7 +58,15 @@ class UserService
 
 
     public function delete($id){
-        $this->userModel->delete($id);
+        $user = $this->userModel->find($id);
+
+        if(!$user){
+            return [
+                'error' => 'user not found',
+                'code' => 404
+            ];
+        }
+        return $this->userModel->delete($id);
     }
 
     public function activate($id){

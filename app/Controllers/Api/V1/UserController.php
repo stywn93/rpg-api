@@ -79,7 +79,12 @@ class UserController extends ResourceController
     }
 
     public function delete($id = null){
-        $this->userService->delete($id);
+        $user = $this->userService->delete($id);
+        if (isset($user['error'])) {
+            if (($user['code'] ?? 500) === 404) {
+                return $this->failNotFound($user['error']);
+            }
+        }
         return $this->respondDeleted([
             'status' => 'success',
             'message' => 'User deleted successfully',
