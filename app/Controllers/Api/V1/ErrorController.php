@@ -11,7 +11,7 @@ class ErrorController extends ResourceController
     {
         return $this->respond([
             'status'  => 'Error',
-            'message' => 'Endpoint tidak ditemukan',
+            'message' => 'Endpoint not found',
             'data'    => null,
             'errors'  => null
         ], 404);

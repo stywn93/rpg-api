@@ -27,27 +27,33 @@ class UserService
         return $this->userModel->find($this->userModel->getInsertID());
     }
 
-    public function update($id, $data){
-        if(isset($data['password'])){
+    public function update($id, $data)
+    {
+        if (isset($data['password'])) {
             $data['password'] = password_hash($data['password'], PASSWORD_DEFAULT);
+        }
+        //harusnya cek di sini bukan by ID tapi by email
+        $user = $this->userModel->find($id);
+
+        if(!$user){
+            return ['error' => $this->userModel->errors()];
+        }
+        if($this->userModel->where('email', $data['email'])->where('id !=', $id)->first()){
+            return [
+                'error' => 'email already exists',
+                'code' => 409
+            ];
         }
         $this->userModel->update($id, $data);
         return $this->userModel->find($id);
     }
+
 
     public function delete($id){
         $this->userModel->delete($id);
     }
 
     public function activate($id){
-        if (! is_numeric($id) || (int) $id <= 0) {
-            return [
-                'error' => 'ID not valid',
-                'code' => 400,
-            ];
-        }
-
-        $id = (int) $id;
         $user = $this->userModel->find($id);
         if (! $user) {
             return [
@@ -71,6 +77,27 @@ class UserService
     }
 
     public function suspend($id){
-        $user = $this->userModel->update($id, ['status' => 'suspended']);
+        $user = $this->userModel->find($id);
+        if (! $user) {
+            return [
+                'error' => 'User not found',
+                'code' => 404,
+            ];
+        }
+
+        $updated = $this->userModel->update($id, ['status' => 'suspended']);
+
+        if ($updated === false) {
+            return [
+                'error' => $this->userModel->errors(),
+                'code' => 422,
+            ];
+        }
+
+        return [
+            'success' => true,
+            'data' => $this->userModel->find($id),
+        ];
+
     }
 }
