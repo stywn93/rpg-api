@@ -7,7 +7,7 @@ use CodeIgniter\RESTful\ResourceController;
 
 class UserController extends ResourceController
 {
-//    protected $format = 'json';
+    protected $format = 'json';
     protected $userService;
 
     public function __construct(){
