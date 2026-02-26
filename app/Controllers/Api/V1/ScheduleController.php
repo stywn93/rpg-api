@@ -1,12 +1,12 @@
 <?php
 
-namespace App\Controllers;
+namespace App\Controllers\Api\V1;
 
-use App\Controllers\BaseController;
+
 use App\Services\scheduleService;
-use CodeIgniter\HTTP\ResponseInterface;
+use CodeIgniter\RESTful\ResourceController;
 
-class ScheduleController extends BaseController
+class ScheduleController extends ResourceController
 {
     protected $format = 'json';
     protected $scheduleService;

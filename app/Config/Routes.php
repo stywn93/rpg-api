@@ -19,6 +19,9 @@ $routes->group('api/v1', ['namespace' => 'App\Controllers\Api\V1', 'filter' => '
     $routes->resource('patients', ['controller' => 'PatientController', 'except' => ['show', 'edit']]);
     $routes->get('patients/(:num)', 'PatientController::show/$1'); //replace karen wildcard (:any) akan menghalangi get by parent
     $routes->get('patients/parent/(:num)', 'PatientController::showByParent/$1');
+
+    $routes->resource('schedules', ['controller' => 'ScheduleController']);
+    $routes->resource('servicetypes', ['controller' => 'ServiceTypeController']);
 });
 
 $routes->set404Override('\App\Controllers\Api\V1\ErrorController::notFound');

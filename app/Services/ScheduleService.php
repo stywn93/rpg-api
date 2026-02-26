@@ -25,9 +25,9 @@ class ScheduleService
 
     public function create($data)
     {
-        if ($this->scheduleModel->withDeleted()->where('nik', $data['nik'])->first()) {
+        if ($this->scheduleModel->withDeleted()->where('hari', $data['hari'])->first()) {
             return [
-                'error' => 'NIK already used',
+                'error' => 'Those day already exists.',
                 'code' => 409
             ];
         }
@@ -48,15 +48,6 @@ class ScheduleService
                 'code' => 404
             ];
         }
-        if(isset($data['nik'])){
-            if ($this->scheduleModel->where('nik', $data['nik'])->where('id !=', $id)->first()) {
-                return [
-                    'error' => 'NIK already used',
-                    'code' => 409
-                ];
-            }
-        }
-
         $this->scheduleModel->update($id, $data);
         return $this->scheduleModel->find($id);
     }
@@ -73,10 +64,6 @@ class ScheduleService
             ];
         }
         return $this->scheduleModel->delete($id);
-    }
-
-    public function getByParent($parentID){
-        return $this->scheduleModel->where('parent_id', $parentID)->paginate(10);
     }
 
 }
