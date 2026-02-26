@@ -42,18 +42,15 @@ class PatientService
                 'code' => 404
             ];
         }
-        if ($this->patientModel->where('email', $data['email'])->where('id !=', $id)->first()) {
-            return [
-                'error' => 'email already exists',
-                'code' => 409
-            ];
+        if(isset($data['nik'])){
+            if ($this->patientModel->where('nik', $data['nik'])->where('id !=', $id)->first()) {
+                return [
+                    'error' => 'NIK already used',
+                    'code' => 409
+                ];
+            }
         }
-        if (isset($data['status'])) {
-            return [
-                'error' => 'wrong API to activate or suspend',
-                'code' => 400
-            ];
-        }
+
         $this->patientModel->update($id, $data);
         return $this->patientModel->find($id);
     }
@@ -72,53 +69,9 @@ class PatientService
         return $this->patientModel->delete($id);
     }
 
-    public function activate($id)
-    {
-        $patient = $this->patientModel->find($id);
-        if (!$patient) {
-            return [
-                'error' => 'patient not found',
-                'code' => 404,
-            ];
-        }
-
-        $updated = $this->patientModel->update($id, ['status' => 'active']);
-        if ($updated === false) {
-            return [
-                'error' => $this->patientModel->errors(),
-                'code' => 422,
-            ];
-        }
-
-        return [
-            'success' => true,
-            'data' => $this->patientModel->find($id),
-        ];
+    public function getByParent($parentID){
+        return $this->patientModel->where('parent_id', $parentID)->findAll();
+//        return $patients;
     }
 
-    public function suspend($id)
-    {
-        $patient = $this->patientModel->find($id);
-        if (!$patient) {
-            return [
-                'error' => 'patient not found',
-                'code' => 404,
-            ];
-        }
-
-        $updated = $this->patientModel->update($id, ['status' => 'suspended']);
-
-        if ($updated === false) {
-            return [
-                'error' => $this->patientModel->errors(),
-                'code' => 422,
-            ];
-        }
-
-        return [
-            'success' => true,
-            'data' => $this->patientModel->find($id),
-        ];
-
-    }
 }

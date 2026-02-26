@@ -16,6 +16,7 @@ $routes->group('api/v1', ['namespace' => 'App\Controllers\Api\V1', 'filter' => '
     $routes->post('users/(:num)/activate/', 'UserController::activate/$1');
     $routes->post('users/(:num)/suspend', 'UserController::suspend/$1');
     $routes->resource('patients', ['controller' => 'PatientController']);
+    $routes->get('patients/parent/(:num)', 'PatientController::showByParent/$1');
 });
 
 $routes->set404Override('\App\Controllers\Api\V1\ErrorController::notFound');

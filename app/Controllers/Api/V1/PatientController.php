@@ -100,52 +100,20 @@ class PatientController extends ResourceController
         ]);
     }
 
-
-    public function activate($id)
+    public function showByParent($parentID = null)
     {
-        $result = $this->patientService->activate($id);
-
-        if (isset($result['error'])) {
-            if (($result['code'] ?? 500) === 404) {
-                return $this->failNotFound($result['error']);
-            }
-
-            if (($result['code'] ?? 500) === 422) {
-                return $this->failValidationErrors($result['error']);
-            }
-
-            return $this->fail($result['error'], $result['code'] ?? 400);
+        $patients = $this->patientService->getByParent($parentID);
+        if (!$patients) {
+            return $this->failNotFound("patient not found");
         }
-
         return $this->respond([
             'status' => 'success',
-            'message' => 'patient ' . $id . ' activated',
-            'data' => $id ?? null,
+            'message' => 'patient data fetched',
+            'data' => $patients,
             'errors' => null
         ]);
     }
 
-    public function suspend($id)
-    {
-        $result = $this->patientService->suspend($id);
 
-        if (isset($result['error'])) {
-            if (($result['code'] ?? 500) === 404) {
-                return $this->failNotFound($result['error']);
-            }
 
-            if (($result['code'] ?? 500) === 422) {
-                return $this->failValidationErrors($result['error']);
-            }
-
-            return $this->fail($result['error'], $result['code'] ?? 400);
-        }
-
-        return $this->respond([
-            'status' => 'success',
-            'message' => 'patient ' . $id . ' suspended',
-            'data' => $id ?? null,
-            'errors' => null
-        ]);
-    }
 }

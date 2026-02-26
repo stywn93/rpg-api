@@ -40,11 +40,13 @@ class UserService
                 'code' => 404
             ];
         }
-        if($this->userModel->where('email', $data['email'])->where('id !=', $id)->first()){
-            return [
-                'error' => 'email already exists',
-                'code' => 409
-            ];
+        if(isset($data['email'])){
+            if($this->userModel->where('email', $data['email'])->where('id !=', $id)->first()){
+                return [
+                    'error' => 'email already exists',
+                    'code' => 409
+                ];
+            }
         }
         if(isset($data['status'])){
             return [
