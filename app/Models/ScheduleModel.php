@@ -13,7 +13,7 @@ class ScheduleModel extends Model
     protected $useSoftDeletes   = false;
 
     protected $allowedFields = [
-        'tanggal',
+        'hari',
         'jam_mulai',
         'jam_selesai',
         'kuota',
@@ -27,7 +27,7 @@ class ScheduleModel extends Model
     protected $updatedField  = 'updated_at';
 
     protected $validationRules = [
-        'tanggal'         => 'required|valid_date',
+        'hari'            => 'required|in_list[selasa,rabu,kamis]',
         'jam_mulai'       => 'required',
         'jam_selesai'     => 'required',
         'kuota'           => 'required|integer',
