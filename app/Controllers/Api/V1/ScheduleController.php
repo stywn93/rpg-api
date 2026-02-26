@@ -99,17 +99,4 @@ class ScheduleController extends ResourceController
         ]);
     }
 
-    public function showByParent($parentID = null)
-    {
-        $schedules = $this->scheduleService->getByParent($parentID);
-        if (!$schedules) {
-            return $this->failNotFound("schedule not found");
-        }
-        return $this->respond([
-            'status' => 'success',
-            'message' => 'schedule data fetched',
-            'data' => $schedules,
-            'errors' => null
-        ]);
-    }
 }

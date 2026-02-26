@@ -2,4 +2,6 @@
   - ~~jika sudah didelete maka tidak terbaca oleh where, berarti query checkingnya juga butuh include deleted~~ 
 - ~~add unique checking on create user~~
 - penambahan modul schedules
+- sebelum add module maka cek dulu apakah sudah ada servicenya
 - sebelum penambahan modul schedules ternyata butuh menambah modul service dulu
+- tidak p

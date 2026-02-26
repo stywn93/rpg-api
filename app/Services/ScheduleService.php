@@ -3,14 +3,17 @@
 namespace App\Services;
 
 use App\Models\ScheduleModel;
+use App\Models\ServiceTypeModel;
 
 class ScheduleService
 {
     protected $scheduleModel;
+    protected $serviceTypeModel;
 
     public function __construct()
     {
         $this->scheduleModel = new scheduleModel();
+        $this->serviceTypeModel = new serviceTypeModel();
     }
 
     public function list($perPage = 10)
@@ -25,10 +28,12 @@ class ScheduleService
 
     public function create($data)
     {
-        if ($this->scheduleModel->withDeleted()->where('hari', $data['hari'])->first()) {
+        //butuh ditambah pengecekan service apakah ada atau tidak
+        $serviceType = $this->serviceTypeModel->find($data['service_type_id']);
+        if (!$serviceType) {
             return [
-                'error' => 'Those day already exists.',
-                'code' => 409
+                'error' => 'service type not found',
+                'code' => 404
             ];
         }
         $inserted = $this->scheduleModel->insert($data);

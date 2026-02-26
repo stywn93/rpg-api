@@ -99,17 +99,4 @@ class ServiceTypeController extends ResourceController
         ]);
     }
 
-    public function showByParent($parentID = null)
-    {
-        $services = $this->serviceTypeService->getByParent($parentID);
-        if (!$services) {
-            return $this->failNotFound("service type not found");
-        }
-        return $this->respond([
-            'status' => 'success',
-            'message' => 'service type data fetched',
-            'data' => $services,
-            'errors' => null
-        ]);
-    }
 }

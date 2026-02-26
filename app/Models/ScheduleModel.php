@@ -27,7 +27,7 @@ class ScheduleModel extends Model
     protected $updatedField  = 'updated_at';
 
     protected $validationRules = [
-        'hari'            => 'required|in_list[Selasa,Rabu,Kamis]',
+        'hari'            => 'required|in_list[selasa,rabu,kamis]',
         'jam_mulai'       => 'required',
         'jam_selesai'     => 'required',
         'kuota'           => 'required|integer',
