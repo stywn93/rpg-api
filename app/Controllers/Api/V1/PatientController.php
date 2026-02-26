@@ -32,7 +32,7 @@ class PatientController extends ResourceController
     {
         $patient = $this->patientService->find($id);
         if (!$patient) {
-            return $this->failNotFound("patient not found");
+            return $this->failNotFound("patient not founds");
         }
         return $this->respond([
             'status' => 'success',

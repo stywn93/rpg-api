@@ -25,6 +25,12 @@ class PatientService
 
     public function create($data)
     {
+        if ($this->patientModel->withDeleted()->where('nik', $data['nik'])->first()) {
+            return [
+                'error' => 'NIK already used',
+                'code' => 409
+            ];
+        }
         $inserted = $this->patientModel->insert($data);
         if ($inserted === false) {
             return ['error' => $this->patientModel->errors()];
@@ -70,8 +76,7 @@ class PatientService
     }
 
     public function getByParent($parentID){
-        return $this->patientModel->where('parent_id', $parentID)->findAll();
-//        return $patients;
+        return $this->patientModel->where('parent_id', $parentID)->paginate(10);
     }
 
 }

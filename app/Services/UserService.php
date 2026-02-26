@@ -20,6 +20,12 @@ class UserService
 
     public function create($data){
         $data['password'] = password_hash($data['password'], PASSWORD_DEFAULT);
+        if ($this->userModel->withDeleted()->where('email', $data['email'])->first()) {
+            return [
+                'error' => 'Email already used',
+                'code' => 409
+            ];
+        }
         $inserted = $this->userModel->insert($data);
         if ($inserted === false) {
             return ['error' => $this->userModel->errors()];

@@ -15,7 +15,9 @@ $routes->group('api/v1', ['namespace' => 'App\Controllers\Api\V1', 'filter' => '
     $routes->resource('users', ['controller' => 'UserController']);
     $routes->post('users/(:num)/activate/', 'UserController::activate/$1');
     $routes->post('users/(:num)/suspend', 'UserController::suspend/$1');
-    $routes->resource('patients', ['controller' => 'PatientController']);
+
+    $routes->resource('patients', ['controller' => 'PatientController', 'except' => ['show', 'edit']]);
+    $routes->get('patients/(:num)', 'PatientController::show/$1'); //replace karen wildcard (:any) akan menghalangi get by parent
     $routes->get('patients/parent/(:num)', 'PatientController::showByParent/$1');
 });
 
