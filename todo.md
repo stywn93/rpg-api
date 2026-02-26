@@ -1,7 +1,9 @@
 - ~~add unique checking on create patient~~
   - ~~jika sudah didelete maka tidak terbaca oleh where, berarti query checkingnya juga butuh include deleted~~ 
 - ~~add unique checking on create user~~
-- penambahan modul schedules
-- sebelum add module maka cek dulu apakah sudah ada servicenya
-- sebelum penambahan modul schedules ternyata butuh menambah modul service dulu
-- tidak p
+- ~~penambahan modul schedules~~
+- ~~sebelum add module maka cek dulu apakah sudah ada servicenya~~
+- ~~sebelum penambahan modul schedules ternyata butuh menambah modul service dulu~~
+- butuh pengecekan di queue apakah 1 orang bisa terdaftar di banyak antrian
+- butuh pengecekan di queue apakah jadwal ada, apakah pasien ada
+- 
