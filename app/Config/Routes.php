@@ -23,6 +23,7 @@ $routes->group('api/v1', ['namespace' => 'App\Controllers\Api\V1', 'filter' => '
     $routes->resource('schedules', ['controller' => 'ScheduleController']);
     $routes->resource('servicetypes', ['controller' => 'ServiceTypeController']);
     $routes->resource('queues', ['controller' => 'QueueController']);
+    $routes->resource('queuelogs', ['controller' => 'QueueLogController']);
 });
 
 $routes->set404Override('\App\Controllers\Api\V1\ErrorController::notFound');
