@@ -24,7 +24,7 @@ class QueueLogModel extends Model
 
     protected $validationRules = [
         'queue_id'          => 'required|integer',
-        'status_sebelumnya' => 'required|in_list[booked,checked_in,called,served,finished,no_show,cancelled]',
+//        'status_sebelumnya' => 'in_list[booked,checked_in,called,served,finished,no_show,cancelled]',
         'status_baru'       => 'required|in_list[booked,checked_in,called,served,finished,no_show,cancelled]',
         'changed_by'        => 'required|integer',
     ];
