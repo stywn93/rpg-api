@@ -11,6 +11,7 @@ class QueueLogModel extends Model
     protected $useAutoIncrement = true;
     protected $returnType       = 'array';
     protected $useSoftDeletes   = false;
+    protected $createdField     = 'changed_at';
 
     protected $allowedFields = [
         'queue_id',
