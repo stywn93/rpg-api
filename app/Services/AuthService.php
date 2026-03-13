@@ -25,9 +25,18 @@ class AuthService
         $data['password'] = password_hash($data['password'], PASSWORD_DEFAULT);
 
         $res = $this->userModel->insert($data);
+        if ($res === false) {
+                return [
+                    'error' => $this->userModel->errors(),
+                    'code' => 500
+                ];
+            }
 
-        return ['success' => true];
+            $user = $this->userModel->find($this->userModel->getInsertID());
+            unset($user['password']); // jangan kirim password ke client
+            return $user;
     }
+
 
     public function login($email, $password)
     {

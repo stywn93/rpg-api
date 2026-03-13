@@ -33,7 +33,6 @@ class UserModel extends Model
         'name' => 'required|min_length[3]',
         'email' => 'required|valid_email|is_unique[users.email,id,{id}]',
         'password' => 'required|min_length[6]',
-        'role' => 'required|in_list[parent,petugas,admin,pimpinan]',
 
     ];
 

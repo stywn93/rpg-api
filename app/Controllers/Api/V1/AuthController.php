@@ -23,8 +23,7 @@ class AuthController extends ResourceController
 
         return $this->respond([
             'status' => 'success',
-            'message' => 'User registered successfully',
-            'data' => $data
+            'message' => 'User registered successfully'
         ]);
     }
 

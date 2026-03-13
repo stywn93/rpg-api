@@ -45,7 +45,7 @@ class UserController extends ResourceController
             return $this->failValidationErrors($insert['error']);
         }
         return $this->respondCreated([
-            'status' => 'success',
+            'status' => 'successfull',
             'message' => 'User created successfully',
             'data' => $insert,
             'errors' => null
