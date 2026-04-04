@@ -54,6 +54,14 @@ class AuthService
 
         return [
             'token' => $token,
+            'details' => [
+                'id' => $user['id'],
+                'name' => $user['name'],
+                'email' => $user['email'],
+                'phone' => $user['phone'],
+                'role' => $user['role'],
+                'status' => $user['status'],
+            ],
             'expires_in' => 7200
         ];
     }
