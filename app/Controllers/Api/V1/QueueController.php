@@ -3,7 +3,7 @@
 namespace App\Controllers\Api\V1;
 
 
-use App\Services\queueService;
+use App\Services\QueueService;
 use CodeIgniter\RESTful\ResourceController;
 
 class QueueController extends ResourceController
@@ -43,11 +43,16 @@ class QueueController extends ResourceController
 
     public function create()
     {
-        $data = $this->request->getJSON(true);
+        $data = $this->getRequestData();
         $insert = $this->queueService->create($data);
         if (isset($insert['error'])) {
+            if (($insert['code'] ?? 500) === 400) {
+                return $this->failValidationErrors($insert['error']);
+            }
+
             return $this->failValidationErrors($insert['error']);
         }
+
         return $this->respondCreated([
             'status' => 'success',
             'message' => 'queue created successfully',
@@ -58,7 +63,7 @@ class QueueController extends ResourceController
 
     public function update($id = null)
     {
-        $data = $this->request->getJSON(true);
+        $data = $this->getRequestData();
         $queue = $this->queueService->update($id, $data);
 
         if (isset($queue['error'])) {
@@ -66,14 +71,11 @@ class QueueController extends ResourceController
                 return $this->failNotFound($queue['error']);
             }
 
-            if (($queue['code'] ?? 500) === 409) {
-                return $this->failValidationErrors($queue['error']);
-            }
-
             if (($queue['code'] ?? 500) === 400) {
                 return $this->failValidationErrors($queue['error']);
             }
         }
+
         return $this->respondUpdated([
             'status' => 'success',
             'message' => 'queue updated successfully',
@@ -99,4 +101,19 @@ class QueueController extends ResourceController
         ]);
     }
 
+    private function getRequestData(): array
+    {
+        $json = $this->request->getJSON(true);
+        if (is_array($json)) {
+            return $json;
+        }
+
+        $raw = $this->request->getRawInput();
+        if (is_array($raw) && $raw !== []) {
+            return $raw;
+        }
+
+        $post = $this->request->getPost();
+        return is_array($post) ? $post : [];
+    }
 }

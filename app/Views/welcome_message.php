@@ -346,7 +346,12 @@
             <pre><code>{
   "status": "success",
   "message": "Queue created successfully",
-  "data": { ... },
+  "data": {
+    "id": 1,
+    "tanggal_kunjungan": "2026-04-19",
+    "patient_id": 12,
+    "status": "booked"
+  },
   "errors": null
 }</code></pre>
         </article>
