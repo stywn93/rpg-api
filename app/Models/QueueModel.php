@@ -15,6 +15,7 @@ class QueueModel extends Model
     protected $allowedFields = [
         'tanggal_kunjungan',
         'patient_id',
+        'nomor_antrian',
         'status',
     ];
 
@@ -23,25 +24,73 @@ class QueueModel extends Model
     protected $validationRules = [
         'tanggal_kunjungan' => 'required|valid_date[Y-m-d]',
         'patient_id'        => 'permit_empty|integer|is_not_unique[patients.id]',
+        'nomor_antrian'     => 'permit_empty|integer|greater_than[0]',
         'status'            => 'required|in_list[booked,checked_in,called,served,finished,no_show,cancelled]',
     ];
 
     protected $skipValidation = false;
 
-    public function getQueueListWithPatient(int $perPage = 10): array
+    public function getQueueListWithPatient(int $perPage = 10, ?string $tanggal = null): array
     {
-        return $this->select(
-            "queue.id, queue.patient_id AS id_pasien,
-            patients.nama AS nama_lengkap,
+        $builder = $this->select(
+            "queue.id,
+            queue.nomor_antrian AS nomor,
+            queue.nomor_antrian,
+            patients.nama AS nama_pasien,
             patients.jenis_kelamin,
-            TIMESTAMPDIFF(YEAR, patients.tanggal_lahir, CURDATE()) AS usia,
+            CONCAT(
+                TIMESTAMPDIFF(YEAR, patients.tanggal_lahir, queue.tanggal_kunjungan),
+                ' tahun ',
+                MOD(TIMESTAMPDIFF(MONTH, patients.tanggal_lahir, queue.tanggal_kunjungan), 12),
+                ' bulan'
+            ) AS usia,
             queue.tanggal_kunjungan,
-            CONCAT('Q-', LPAD(queue.id, 4, '0')) AS kode_antrian"
+            queue.status,
+            CONCAT('Q-', LPAD(queue.id, 4, '0')) AS kode_referensi"
         )
             ->join('patients', 'patients.id = queue.patient_id', 'left')
-            ->where('patients.deleted_at', null)
+            ->where('patients.deleted_at', null);
+
+        if ($tanggal !== null && $tanggal !== '') {
+            $builder->where('queue.tanggal_kunjungan', $tanggal);
+        }
+
+        return $builder
             ->orderBy('queue.tanggal_kunjungan', 'DESC')
-            ->orderBy('queue.id', 'DESC')
+            ->orderBy('queue.nomor_antrian', 'ASC')
             ->paginate($perPage);
+    }
+
+    public function insertWithDailyQueueNumber(array $payload)
+    {
+        $this->db->transBegin();
+
+        $query = $this->db->query(
+            'SELECT COALESCE(MAX(nomor_antrian), 0) AS last_number
+             FROM `queue`
+             WHERE `tanggal_kunjungan` = ?
+             FOR UPDATE',
+            [$payload['tanggal_kunjungan']]
+        );
+
+        $payload['nomor_antrian'] = ((int) ($query->getRow('last_number') ?? 0)) + 1;
+
+        $inserted = $this->insert($payload);
+        if ($inserted === false) {
+            $this->db->transRollback();
+
+            return false;
+        }
+
+        if ($this->db->transStatus() === false) {
+            $this->db->transRollback();
+
+            return false;
+        }
+
+        $insertId = $this->getInsertID();
+        $this->db->transCommit();
+
+        return $this->find($insertId);
     }
 }

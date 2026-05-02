@@ -5,6 +5,7 @@ namespace App\Controllers\Api\V1;
 
 use App\Services\QueueService;
 use CodeIgniter\RESTful\ResourceController;
+use DateTime;
 
 class QueueController extends ResourceController
 {
@@ -19,10 +20,36 @@ class QueueController extends ResourceController
     public function index()
     {
         $perPage = $this->request->getGet('per_page') ?? 10;
+        $tanggal = $this->request->getGet('tanggal_kunjungan') ?? $this->request->getGet('tanggal');
+
+        if ($tanggal !== null && ! $this->isValidDate($tanggal)) {
+            return $this->failValidationErrors([
+                'tanggal_kunjungan' => 'tanggal_kunjungan must use format Y-m-d',
+            ]);
+        }
+
         return $this->respond([
             'status' => 'success',
             'message' => 'queues data fetched',
-            'data' => $this->queueService->list($perPage),
+            'data' => $this->queueService->list($perPage, $tanggal),
+            'errors' => null
+        ]);
+    }
+
+    public function filterByDate($tanggal)
+    {
+        $perPage = $this->request->getGet('per_page') ?? 10;
+
+        if (! $this->isValidDate($tanggal)) {
+            return $this->failValidationErrors([
+                'tanggal_kunjungan' => 'tanggal_kunjungan must use format Y-m-d',
+            ]);
+        }
+
+        return $this->respond([
+            'status' => 'success',
+            'message' => 'queues data fetched',
+            'data' => $this->queueService->list($perPage, $tanggal),
             'errors' => null
         ]);
     }
@@ -115,5 +142,12 @@ class QueueController extends ResourceController
 
         $post = $this->request->getPost();
         return is_array($post) ? $post : [];
+    }
+
+    private function isValidDate(string $tanggal): bool
+    {
+        $date = DateTime::createFromFormat('Y-m-d', $tanggal);
+
+        return $date !== false && $date->format('Y-m-d') === $tanggal;
     }
 }

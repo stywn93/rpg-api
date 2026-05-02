@@ -14,15 +14,11 @@ class PatientModel extends Model
 
     protected $allowedFields = [
         'parent_id',
-        'nik',
         'no_kk',
         'nama',
         'tanggal_lahir',
         'jenis_kelamin',
         'alamat',
-        'kecamatan',
-        'desa',
-        'berat_lahir',
     ];
 
     protected $useTimestamps = true;

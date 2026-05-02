@@ -18,9 +18,9 @@ class QueueService
         $this->queueModel = new QueueModel();
     }
 
-    public function list($perPage = 10)
+    public function list($perPage = 10, ?string $tanggal = null)
     {
-        return $this->queueModel->getQueueListWithPatient((int) $perPage);
+        return $this->queueModel->getQueueListWithPatient((int) $perPage, $tanggal);
     }
 
     public function find($id)
@@ -41,7 +41,7 @@ class QueueService
             ];
         }
 
-        $inserted = $this->queueModel->insert($payload);
+        $inserted = $this->queueModel->insertWithDailyQueueNumber($payload);
         if ($inserted === false) {
             return [
                 'error' => $this->queueModel->errors(),
@@ -49,7 +49,7 @@ class QueueService
             ];
         }
 
-        return $this->queueModel->find($this->queueModel->getInsertID());
+        return $inserted;
     }
 
     public function update($id, $data)

@@ -7,6 +7,14 @@ use App\Models\PatientModel;
 class PatientService
 {
     protected $patientModel;
+    protected array $allowedFields = [
+        'parent_id',
+        'no_kk',
+        'nama',
+        'tanggal_lahir',
+        'jenis_kelamin',
+        'alamat',
+    ];
 
     public function __construct()
     {
@@ -15,7 +23,7 @@ class PatientService
 
     public function list($perPage = 10)
     {
-        return $this->patientModel->paginate($perPage);
+        return $this->patientModel->paginate((int) $perPage);
     }
 
     public function find($id)
@@ -25,15 +33,22 @@ class PatientService
 
     public function create($data)
     {
-        if ($this->patientModel->withDeleted()->where('nik', $data['nik'])->first()) {
+        $payload = $this->preparePayload($data);
+        if ($payload === []) {
             return [
-                'error' => 'NIK already used',
-                'code' => 409
+                'error' => [
+                    'payload' => 'patient payload is empty or invalid',
+                ],
+                'code' => 400,
             ];
         }
-        $inserted = $this->patientModel->insert($data);
+
+        $inserted = $this->patientModel->insert($payload);
         if ($inserted === false) {
-            return ['error' => $this->patientModel->errors()];
+            return [
+                'error' => $this->patientModel->errors(),
+                'code' => 400,
+            ];
         }
         return $this->patientModel->find($this->patientModel->getInsertID());
     }
@@ -48,19 +63,27 @@ class PatientService
                 'code' => 404
             ];
         }
-        if(isset($data['nik'])){
-            if ($this->patientModel->where('nik', $data['nik'])->where('id !=', $id)->first()) {
-                return [
-                    'error' => 'NIK already used',
-                    'code' => 409
-                ];
-            }
+
+        $payload = $this->preparePayload($data);
+        if ($payload === []) {
+            return [
+                'error' => [
+                    'payload' => 'patient payload is empty or invalid',
+                ],
+                'code' => 400,
+            ];
         }
 
-        $this->patientModel->update($id, $data);
+        $updated = $this->patientModel->update($id, $payload);
+        if ($updated === false) {
+            return [
+                'error' => $this->patientModel->errors(),
+                'code' => 400,
+            ];
+        }
+
         return $this->patientModel->find($id);
     }
-
 
     public function delete($id)
     {
@@ -79,4 +102,24 @@ class PatientService
         return $this->patientModel->where('parent_id', $parentID)->paginate(10);
     }
 
+    private function preparePayload($data): array
+    {
+        if (! is_array($data)) {
+            return [];
+        }
+
+        $payload = array_intersect_key($data, array_flip($this->allowedFields));
+
+        if (array_key_exists('parent_id', $payload)) {
+            $payload['parent_id'] = (int) $payload['parent_id'];
+        }
+
+        foreach (['no_kk', 'nama', 'tanggal_lahir', 'jenis_kelamin', 'alamat'] as $field) {
+            if (array_key_exists($field, $payload) && is_string($payload[$field])) {
+                $payload[$field] = trim($payload[$field]);
+            }
+        }
+
+        return $payload;
+    }
 }

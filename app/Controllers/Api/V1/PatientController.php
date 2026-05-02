@@ -2,9 +2,7 @@
 
 namespace App\Controllers\Api\V1;
 
-use App\Controllers\BaseController;
-use App\Services\patientService;
-use CodeIgniter\HTTP\ResponseInterface;
+use App\Services\PatientService;
 use CodeIgniter\RESTful\ResourceController;
 
 class PatientController extends ResourceController
@@ -14,7 +12,7 @@ class PatientController extends ResourceController
 
     public function __construct()
     {
-        $this->patientService = new patientService();
+        $this->patientService = new PatientService();
     }
 
     public function index()
@@ -44,7 +42,7 @@ class PatientController extends ResourceController
 
     public function create()
     {
-        $data = $this->request->getJSON(true);
+        $data = $this->getRequestData();
         $insert = $this->patientService->create($data);
         if (isset($insert['error'])) {
             return $this->failValidationErrors($insert['error']);
@@ -59,16 +57,12 @@ class PatientController extends ResourceController
 
     public function update($id = null)
     {
-        $data = $this->request->getJSON(true);
+        $data = $this->getRequestData();
         $patient = $this->patientService->update($id, $data);
 
         if (isset($patient['error'])) {
             if (($patient['code'] ?? 500) === 404) {
                 return $this->failNotFound($patient['error']);
-            }
-
-            if (($patient['code'] ?? 500) === 409) {
-                return $this->failValidationErrors($patient['error']);
             }
 
             if (($patient['code'] ?? 500) === 400) {
@@ -114,6 +108,20 @@ class PatientController extends ResourceController
         ]);
     }
 
+    private function getRequestData(): array
+    {
+        $json = $this->request->getJSON(true);
+        if (is_array($json)) {
+            return $json;
+        }
 
+        $raw = $this->request->getRawInput();
+        if (is_array($raw) && $raw !== []) {
+            return $raw;
+        }
+
+        $post = $this->request->getPost();
+        return is_array($post) ? $post : [];
+    }
 
 }

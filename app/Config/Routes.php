@@ -22,6 +22,7 @@ $routes->group('api/v1', ['namespace' => 'App\Controllers\Api\V1', 'filter' => '
 
     $routes->resource('schedules', ['controller' => 'ScheduleController']);
     $routes->resource('servicetypes', ['controller' => 'ServiceTypeController']);
+    $routes->get('queues/date/(:segment)', 'QueueController::filterByDate/$1');
     $routes->resource('queues', ['controller' => 'QueueController']);
     $routes->resource('queuelogs', ['controller' => 'QueueLogController']);
     $routes->resource('growthrecords', ['controller' => 'GrowthRecordController']);
