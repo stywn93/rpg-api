@@ -32,24 +32,7 @@ class QueueModel extends Model
 
     public function getQueueListWithPatient(int $perPage = 10, ?string $tanggal = null): array
     {
-        $builder = $this->select(
-            "queue.id,
-            queue.nomor_antrian AS nomor,
-            queue.nomor_antrian,
-            patients.nama AS nama_pasien,
-            patients.jenis_kelamin,
-            CONCAT(
-                TIMESTAMPDIFF(YEAR, patients.tanggal_lahir, queue.tanggal_kunjungan),
-                ' tahun ',
-                MOD(TIMESTAMPDIFF(MONTH, patients.tanggal_lahir, queue.tanggal_kunjungan), 12),
-                ' bulan'
-            ) AS usia,
-            queue.tanggal_kunjungan,
-            queue.status,
-            CONCAT('Q-', LPAD(queue.id, 4, '0')) AS kode_referensi"
-        )
-            ->join('patients', 'patients.id = queue.patient_id', 'left')
-            ->where('patients.deleted_at', null);
+        $builder = $this->buildQueuePatientQuery();
 
         if ($tanggal !== null && $tanggal !== '') {
             $builder->where('queue.tanggal_kunjungan', $tanggal);
@@ -59,6 +42,13 @@ class QueueModel extends Model
             ->orderBy('queue.tanggal_kunjungan', 'DESC')
             ->orderBy('queue.nomor_antrian', 'ASC')
             ->paginate($perPage);
+    }
+
+    public function getQueueDetailWithPatient(int $id): ?array
+    {
+        return $this->buildQueuePatientQuery()
+            ->where('queue.id', $id)
+            ->first();
     }
 
     public function insertWithDailyQueueNumber(array $payload)
@@ -91,6 +81,33 @@ class QueueModel extends Model
         $insertId = $this->getInsertID();
         $this->db->transCommit();
 
-        return $this->find($insertId);
+        return $this->getQueueDetailWithPatient((int) $insertId);
+    }
+
+    private function buildQueuePatientQuery()
+    {
+        return $this->select(
+            "queue.id,
+            queue.patient_id,
+            queue.nomor_antrian AS nomor,
+            queue.nomor_antrian,
+            queue.tanggal_kunjungan,
+            queue.status,
+            patients.nama AS nama_pasien,
+            patients.nama AS nama_lengkap,
+            patients.jenis_kelamin,
+            CONCAT(
+                TIMESTAMPDIFF(YEAR, patients.tanggal_lahir, queue.tanggal_kunjungan),
+                ' tahun ',
+                MOD(TIMESTAMPDIFF(MONTH, patients.tanggal_lahir, queue.tanggal_kunjungan), 12),
+                ' bulan'
+            ) AS usia,
+            users.name AS nama_orang_tua,
+            patients.alamat,
+            CONCAT('Q-', LPAD(queue.id, 4, '0')) AS kode_referensi"
+        )
+            ->join('patients', 'patients.id = queue.patient_id', 'left')
+            ->join('users', 'users.id = patients.parent_id', 'left')
+            ->where('patients.deleted_at', null);
     }
 }

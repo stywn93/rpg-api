@@ -25,7 +25,7 @@ class QueueService
 
     public function find($id)
     {
-        return $this->queueModel->find($id);
+        return $this->queueModel->getQueueDetailWithPatient((int) $id);
     }
 
     public function create($data)
@@ -81,7 +81,7 @@ class QueueService
             ];
         }
 
-        return $this->queueModel->find($id);
+        return $this->queueModel->getQueueDetailWithPatient((int) $id);
     }
 
     public function delete($id)
