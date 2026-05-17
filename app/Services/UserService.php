@@ -10,15 +10,26 @@ class UserService
         $this->userModel = new UserModel();
     }
 
-    public function list($perPage = 10){
-        return $this->userModel->paginate($perPage);
+    public function list($perPage = 10, $page = null, $searchTerm = null, $status = null){
+        $users = $this->userModel->searchPaginated(
+            (int) $perPage,
+            $page !== null ? (int) $page : null,
+            $searchTerm,
+            $status
+        );
+
+        return [
+            'data' => $this->presentUsers($users),
+            'meta' => $this->userModel->getPaginationMeta(),
+        ];
     }
 
     public function find($id){
-        return $this->userModel->find($id);
+        return $this->presentUser($this->userModel->find($id));
     }
 
     public function create($data){
+        $data = $this->normalizeRolePayload($data);
         $data['password'] = password_hash($data['password'], PASSWORD_DEFAULT);
         if ($this->userModel->withDeleted()->where('email', $data['email'])->first()) {
             return [
@@ -30,11 +41,12 @@ class UserService
         if ($inserted === false) {
             return ['error' => $this->userModel->errors()];
         }
-        return $this->userModel->find($this->userModel->getInsertID());
+        return $this->presentUser($this->userModel->find($this->userModel->getInsertID()));
     }
 
     public function update($id, $data)
     {
+        $data = $this->normalizeRolePayload($data);
         if (isset($data['password'])) {
             $data['password'] = password_hash($data['password'], PASSWORD_DEFAULT);
         }
@@ -61,7 +73,7 @@ class UserService
             ];
         }
         $this->userModel->update($id, $data);
-        return $this->userModel->find($id);
+        return $this->presentUser($this->userModel->find($id));
     }
 
 
@@ -123,5 +135,38 @@ class UserService
             'data' => $this->userModel->find($id),
         ];
 
+    }
+
+    private function normalizeRolePayload($data)
+    {
+        if (! is_array($data)) {
+            return [];
+        }
+
+        if (isset($data['peran']) && ! isset($data['role'])) {
+            $data['role'] = $data['peran'];
+        }
+
+        unset($data['peran']);
+
+        return $data;
+    }
+
+    private function presentUsers(array $users): array
+    {
+        return array_map(fn ($user) => $this->presentUser($user), $users);
+    }
+
+    private function presentUser($user)
+    {
+        if (! is_array($user)) {
+            return $user;
+        }
+
+        if (isset($user['role']) && ! isset($user['peran'])) {
+            $user['peran'] = $user['role'];
+        }
+
+        return $user;
     }
 }

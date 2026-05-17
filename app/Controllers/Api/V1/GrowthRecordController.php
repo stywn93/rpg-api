@@ -39,11 +39,27 @@ class GrowthRecordController extends ResourceController
         ]);
     }
 
+    public function showByPatient($id = null)
+    {
+        $growthRecords = $this->growthRecordService->getByPatient($id);
+
+        return $this->respond([
+            'status' => 'success',
+            'message' => 'growth records data fetched',
+            'data' => $growthRecords,
+            'errors' => null
+        ]);
+    }
+
     public function create()
     {
         $data = $this->request->getJSON(true);
         $insert = $this->growthRecordService->create($data);
         if (isset($insert['error'])) {
+            if (($insert['code'] ?? 500) === 404) {
+                return $this->failNotFound($insert['error']);
+            }
+
             return $this->failValidationErrors($insert['error']);
         }
         return $this->respondCreated([

@@ -16,9 +16,10 @@ class GrowthRecordModel extends Model
         'patient_id',
         'berat_badan',
         'tinggi_badan',
-        'lingkar_lengan',
+        'status_gizi',
+        'keadaan_umum',
         'tanggal_pemeriksaan',
-        'catatan',
+        'keterangan',
     ];
 
     protected $useTimestamps = true;
@@ -30,7 +31,10 @@ class GrowthRecordModel extends Model
         'patient_id'          => 'required|integer',
         'berat_badan'         => 'required|decimal',
         'tinggi_badan'        => 'required|decimal',
+        'status_gizi'         => 'required|string|max_length[100]',
+        'keadaan_umum'        => 'required|string|max_length[100]',
         'tanggal_pemeriksaan' => 'required|valid_date',
+        'keterangan'          => 'permit_empty|string',
     ];
 
     protected $skipValidation = false;
@@ -43,7 +47,7 @@ class GrowthRecordModel extends Model
     public function getByPatient($patientId)
     {
         return $this->where('patient_id', $patientId)
-            ->orderBy('tanggal_pemeriksaan', 'ASC')
+            ->orderBy('tanggal_pemeriksaan', 'DESC')
             ->findAll();
     }
 }

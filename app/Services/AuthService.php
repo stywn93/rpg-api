@@ -18,6 +18,8 @@ class AuthService
 
     public function register($data)
     {
+        $data = $this->normalizeRolePayload($data);
+
         if ($this->userModel->where('email', $data['email'])->first()) {
             return ['error' => 'Email already exists'];
         }
@@ -58,9 +60,30 @@ class AuthService
             'name' => $user['name'],
             'email' => $user['email'],
             'phone' => $user['phone'],
+            'alamat' => $user['alamat'] ?? null,
+            'peran' => $user['role'],
             'role' => $user['role'],
             'status' => $user['status'],
-            'expires_in' => 7200
+            'expires_in' => JwtLibrary::TOKEN_TTL_SECONDS
         ];
+    }
+
+    private function normalizeRolePayload($data)
+    {
+        if (! is_array($data)) {
+            return [];
+        }
+
+        if (isset($data['peran']) && ! isset($data['role'])) {
+            $data['role'] = $data['peran'];
+        }
+
+        if (! isset($data['role']) || $data['role'] === null || $data['role'] === '') {
+            $data['role'] = 'user';
+        }
+
+        unset($data['peran']);
+
+        return $data;
     }
 }

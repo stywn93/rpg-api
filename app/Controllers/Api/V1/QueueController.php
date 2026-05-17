@@ -19,8 +19,20 @@ class QueueController extends ResourceController
 
     public function index()
     {
-        $perPage = $this->request->getGet('per_page') ?? 10;
+        $perPage = max(1, (int) ($this->request->getGet('per_page') ?? 10));
         $tanggal = $this->request->getGet('tanggal_kunjungan') ?? $this->request->getGet('tanggal');
+        $status = trim((string) ($this->request->getGet('status') ?? ''));
+        $serviceTypeFilter = $this->parseServiceTypeFilter(
+            $this->request->getGet('jenis_layanan')
+            ?? $this->request->getGet('service_type_ids')
+            ?? $this->request->getGet('layanan')
+        );
+        $nama = trim((string) (
+            $this->request->getGet('nama')
+            ?? $this->request->getGet('search')
+            ?? $this->request->getGet('searchTerm')
+            ?? ''
+        ));
 
         if ($tanggal !== null && ! $this->isValidDate($tanggal)) {
             return $this->failValidationErrors([
@@ -28,17 +40,35 @@ class QueueController extends ResourceController
             ]);
         }
 
+        if (! $serviceTypeFilter['valid']) {
+            return $this->failValidationErrors([
+                'jenis_layanan' => 'jenis_layanan must contain numeric IDs, separated by commas or repeated parameters',
+            ]);
+        }
+
         return $this->respond([
             'status' => 'success',
             'message' => 'queues data fetched',
-            'data' => $this->queueService->list($perPage, $tanggal),
+            'data' => $this->queueService->list($perPage, $tanggal, $status, $nama, $serviceTypeFilter['values']),
             'errors' => null
         ]);
     }
 
     public function filterByDate($tanggal)
     {
-        $perPage = $this->request->getGet('per_page') ?? 10;
+        $perPage = max(1, (int) ($this->request->getGet('per_page') ?? 10));
+        $status = trim((string) ($this->request->getGet('status') ?? ''));
+        $serviceTypeFilter = $this->parseServiceTypeFilter(
+            $this->request->getGet('jenis_layanan')
+            ?? $this->request->getGet('service_type_ids')
+            ?? $this->request->getGet('layanan')
+        );
+        $nama = trim((string) (
+            $this->request->getGet('nama')
+            ?? $this->request->getGet('search')
+            ?? $this->request->getGet('searchTerm')
+            ?? ''
+        ));
 
         if (! $this->isValidDate($tanggal)) {
             return $this->failValidationErrors([
@@ -46,10 +76,16 @@ class QueueController extends ResourceController
             ]);
         }
 
+        if (! $serviceTypeFilter['valid']) {
+            return $this->failValidationErrors([
+                'jenis_layanan' => 'jenis_layanan must contain numeric IDs, separated by commas or repeated parameters',
+            ]);
+        }
+
         return $this->respond([
             'status' => 'success',
             'message' => 'queues data fetched',
-            'data' => $this->queueService->list($perPage, $tanggal),
+            'data' => $this->queueService->list($perPage, $tanggal, $status, $nama, $serviceTypeFilter['values']),
             'errors' => null
         ]);
     }
@@ -149,5 +185,42 @@ class QueueController extends ResourceController
         $date = DateTime::createFromFormat('Y-m-d', $tanggal);
 
         return $date !== false && $date->format('Y-m-d') === $tanggal;
+    }
+
+    private function parseServiceTypeFilter($value): array
+    {
+        if ($value === null) {
+            return [
+                'valid' => true,
+                'values' => null,
+            ];
+        }
+
+        $parts = is_array($value) ? $value : explode(',', (string) $value);
+        $normalized = [];
+
+        foreach ($parts as $part) {
+            $part = trim((string) $part);
+
+            if ($part === '') {
+                continue;
+            }
+
+            if (! ctype_digit($part)) {
+                return [
+                    'valid' => false,
+                    'values' => null,
+                ];
+            }
+
+            $normalized[] = (int) $part;
+        }
+
+        $normalized = array_values(array_unique($normalized));
+
+        return [
+            'valid' => true,
+            'values' => $normalized === [] ? null : $normalized,
+        ];
     }
 }

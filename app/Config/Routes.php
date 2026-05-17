@@ -25,6 +25,7 @@ $routes->group('api/v1', ['namespace' => 'App\Controllers\Api\V1', 'filter' => '
     $routes->get('queues/date/(:segment)', 'QueueController::filterByDate/$1');
     $routes->resource('queues', ['controller' => 'QueueController']);
     $routes->resource('queuelogs', ['controller' => 'QueueLogController']);
+    $routes->get('growthrecords/patient/(:num)', 'GrowthRecordController::showByPatient/$1');
     $routes->resource('growthrecords', ['controller' => 'GrowthRecordController']);
 });
 

@@ -15,19 +15,37 @@ final class UserServiceTest extends CIUnitTestCase
 
         $userModel = $this->getMockBuilder(UserModel::class)
             ->disableOriginalConstructor()
-            ->onlyMethods(['paginate'])
+            ->onlyMethods(['searchPaginated', 'getPaginationMeta'])
             ->getMock();
 
         $userModel->expects($this->once())
-            ->method('paginate')
-            ->with(15)
+            ->method('searchPaginated')
+            ->with(15, 2, 'admin', 'active')
             ->willReturn([['id' => 1]]);
+
+        $userModel->expects($this->once())
+            ->method('getPaginationMeta')
+            ->with('default')
+            ->willReturn([
+                'current_page' => 2,
+                'per_page' => 15,
+                'total' => 40,
+                'last_page' => 3,
+            ]);
 
         $this->setPrivateProperty($service, 'userModel', $userModel);
 
-        $result = $service->list(15);
+        $result = $service->list(15, 2, 'admin', 'active');
 
-        $this->assertSame([['id' => 1]], $result);
+        $this->assertSame([
+            'data' => [['id' => 1]],
+            'meta' => [
+                'current_page' => 2,
+                'per_page' => 15,
+                'total' => 40,
+                'last_page' => 3,
+            ],
+        ], $result);
     }
 
     public function testFindReturnsUser(): void
@@ -57,10 +75,15 @@ final class UserServiceTest extends CIUnitTestCase
 
         $userModel = $this->getMockBuilder(UserModel::class)
             ->disableOriginalConstructor()
-            ->onlyMethods(['insert', 'getInsertID', 'find'])
+            ->onlyMethods(['insert', 'getInsertID', 'find', 'first', 'withDeleted'])
+            ->addMethods(['where'])
             ->getMock();
 
         $plainPassword = 'secret123';
+
+        $userModel->method('withDeleted')->willReturn($userModel);
+        $userModel->method('where')->willReturn($userModel);
+        $userModel->method('first')->willReturn(null);
 
         $userModel->expects($this->once())
             ->method('insert')
@@ -85,6 +108,7 @@ final class UserServiceTest extends CIUnitTestCase
         $result = $service->create([
             'name' => 'Test User',
             'email' => 'new@example.com',
+            'alamat' => 'Jl. Melati No. 10',
             'password' => $plainPassword,
             'role' => 'admin',
             'status' => 'active',
@@ -93,17 +117,65 @@ final class UserServiceTest extends CIUnitTestCase
         $this->assertSame(['id' => 7], $result);
     }
 
+    public function testCreateMapsPeranToRole(): void
+    {
+        $service = new UserService();
+
+        $userModel = $this->getMockBuilder(UserModel::class)
+            ->disableOriginalConstructor()
+            ->onlyMethods(['insert', 'getInsertID', 'find', 'first', 'withDeleted'])
+            ->addMethods(['where'])
+            ->getMock();
+
+        $userModel->method('withDeleted')->willReturn($userModel);
+        $userModel->method('where')->willReturn($userModel);
+        $userModel->method('first')->willReturn(null);
+
+        $userModel->expects($this->once())
+            ->method('insert')
+            ->with($this->callback(function ($data) {
+                return ($data['role'] ?? null) === 'user' && ! isset($data['peran']);
+            }))
+            ->willReturn(true);
+
+        $userModel->expects($this->once())
+            ->method('getInsertID')
+            ->willReturn(8);
+
+        $userModel->expects($this->once())
+            ->method('find')
+            ->with(8)
+            ->willReturn(['id' => 8, 'role' => 'user']);
+
+        $this->setPrivateProperty($service, 'userModel', $userModel);
+
+        $result = $service->create([
+            'name' => 'Regular User',
+            'email' => 'user@example.com',
+            'password' => 'secret123',
+            'peran' => 'user',
+            'status' => 'active',
+        ]);
+
+        $this->assertSame(['id' => 8, 'role' => 'user', 'peran' => 'user'], $result);
+    }
+
     public function testCreateReturnsErrorWhenInsertFails(): void
     {
         $service = new UserService();
 
         $userModel = $this->getMockBuilder(UserModel::class)
             ->disableOriginalConstructor()
-            ->onlyMethods(['insert', 'errors', 'getInsertID', 'find'])
+            ->onlyMethods(['insert', 'errors', 'getInsertID', 'find', 'first', 'withDeleted'])
+            ->addMethods(['where'])
             ->getMock();
 
         $plainPassword = 'secret123';
         $validationErrors = ['email' => 'Email already exists'];
+
+        $userModel->method('withDeleted')->willReturn($userModel);
+        $userModel->method('where')->willReturn($userModel);
+        $userModel->method('first')->willReturn(null);
 
         $userModel->expects($this->once())
             ->method('insert')
@@ -129,6 +201,7 @@ final class UserServiceTest extends CIUnitTestCase
         $result = $service->create([
             'name' => 'Test User',
             'email' => 'existing@example.com',
+            'alamat' => 'Jl. Kenanga No. 5',
             'password' => $plainPassword,
             'role' => 'admin',
             'status' => 'active',
@@ -148,6 +221,11 @@ final class UserServiceTest extends CIUnitTestCase
 
         $plainPassword = 'secret123';
 
+        $userModel->expects($this->exactly(2))
+            ->method('find')
+            ->with(5)
+            ->willReturnOnConsecutiveCalls(['id' => 5], ['id' => 5]);
+
         $userModel->expects($this->once())
             ->method('update')
             ->with(5, $this->callback(function ($data) use ($plainPassword) {
@@ -156,11 +234,6 @@ final class UserServiceTest extends CIUnitTestCase
                     && password_verify($plainPassword, $data['password']);
             }))
             ->willReturn(true);
-
-        $userModel->expects($this->once())
-            ->method('find')
-            ->with(5)
-            ->willReturn(['id' => 5]);
 
         $this->setPrivateProperty($service, 'userModel', $userModel);
 
@@ -178,15 +251,15 @@ final class UserServiceTest extends CIUnitTestCase
             ->onlyMethods(['update', 'find'])
             ->getMock();
 
+        $userModel->expects($this->exactly(2))
+            ->method('find')
+            ->with(5)
+            ->willReturnOnConsecutiveCalls(['id' => 5], ['id' => 5]);
+
         $userModel->expects($this->once())
             ->method('update')
             ->with(5, ['name' => 'Updated'])
             ->willReturn(true);
-
-        $userModel->expects($this->once())
-            ->method('find')
-            ->with(5)
-            ->willReturn(['id' => 5]);
 
         $this->setPrivateProperty($service, 'userModel', $userModel);
 
@@ -195,14 +268,48 @@ final class UserServiceTest extends CIUnitTestCase
         $this->assertSame(['id' => 5], $result);
     }
 
+    public function testUpdatePassesAlamatWhenProvided(): void
+    {
+        $service = new UserService();
+
+        $userModel = $this->getMockBuilder(UserModel::class)
+            ->disableOriginalConstructor()
+            ->onlyMethods(['update', 'find'])
+            ->getMock();
+
+        $userModel->expects($this->exactly(2))
+            ->method('find')
+            ->with(5)
+            ->willReturnOnConsecutiveCalls(
+                ['id' => 5, 'alamat' => 'Jl. Lama'],
+                ['id' => 5, 'alamat' => 'Jl. Baru No. 8']
+            );
+
+        $userModel->expects($this->once())
+            ->method('update')
+            ->with(5, ['alamat' => 'Jl. Baru No. 8'])
+            ->willReturn(true);
+
+        $this->setPrivateProperty($service, 'userModel', $userModel);
+
+        $result = $service->update(5, ['alamat' => 'Jl. Baru No. 8']);
+
+        $this->assertSame(['id' => 5, 'alamat' => 'Jl. Baru No. 8'], $result);
+    }
+
     public function testDeleteCallsModelDelete(): void
     {
         $service = new UserService();
 
         $userModel = $this->getMockBuilder(UserModel::class)
             ->disableOriginalConstructor()
-            ->onlyMethods(['delete'])
+            ->onlyMethods(['find', 'delete'])
             ->getMock();
+
+        $userModel->expects($this->once())
+            ->method('find')
+            ->with(9)
+            ->willReturn(['id' => 9]);
 
         $userModel->expects($this->once())
             ->method('delete')
@@ -224,20 +331,21 @@ final class UserServiceTest extends CIUnitTestCase
             ->onlyMethods(['find', 'update'])
             ->getMock();
 
-        $userModel->expects($this->never())
-            ->method('find');
+        $userModel->expects($this->once())
+            ->method('find')
+            ->with('abc')
+            ->willReturn(null);
 
         $userModel->expects($this->never())
-            ->method('update')
-            ->with(3, ['status' => 'active']);
+            ->method('update');
 
         $this->setPrivateProperty($service, 'userModel', $userModel);
 
         $result = $service->activate('abc');
 
         $this->assertSame([
-            'error' => 'ID not valid',
-            'code' => 400,
+            'error' => 'User not found',
+            'code' => 404,
         ], $result);
     }
 
@@ -306,8 +414,16 @@ final class UserServiceTest extends CIUnitTestCase
 
         $userModel = $this->getMockBuilder(UserModel::class)
             ->disableOriginalConstructor()
-            ->onlyMethods(['update'])
+            ->onlyMethods(['find', 'update'])
             ->getMock();
+
+        $userModel->expects($this->exactly(2))
+            ->method('find')
+            ->with(4)
+            ->willReturnOnConsecutiveCalls(
+                ['id' => 4, 'status' => 'active'],
+                ['id' => 4, 'status' => 'suspended']
+            );
 
         $userModel->expects($this->once())
             ->method('update')
@@ -316,7 +432,11 @@ final class UserServiceTest extends CIUnitTestCase
 
         $this->setPrivateProperty($service, 'userModel', $userModel);
 
-        $service->suspend(4);
-        $this->assertTrue(true);
+        $result = $service->suspend(4);
+
+        $this->assertSame([
+            'success' => true,
+            'data' => ['id' => 4, 'status' => 'suspended'],
+        ], $result);
     }
 }

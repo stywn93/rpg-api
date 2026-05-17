@@ -45,6 +45,18 @@ class JWTAuthFilter implements FilterInterface
             $jwt = new JwtLibrary();
             $decoded = $jwt->validateToken($token);
             $request->user = $decoded->data;
+
+            if (is_array($arguments) && $arguments !== []) {
+                $allowedRoles = array_map('strtolower', $arguments);
+                $userRole = strtolower((string) ($decoded->data->role ?? ''));
+
+                if (! in_array($userRole, $allowedRoles, true)) {
+                    return service('response')->setJSON([
+                        'status' => 'error',
+                        'message' => 'Forbidden'
+                    ])->setStatusCode(403);
+                }
+            }
         } catch(Exception $e){
             return service('response')->setJSON([
                 'status' => 'error',

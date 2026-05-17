@@ -43,13 +43,44 @@ class PatientModel extends Model
     */
     public function getWithParent($id = null)
     {
-        $builder = $this->select('patients.*, users.name as parent_name, users.email as parent_email')
-            ->join('users', 'users.id = patients.parent_id');
+        $builder = $this->buildPatientWithAgeQuery();
 
         if ($id !== null) {
             return $builder->where('patients.id', $id)->first();
         }
 
         return $builder->findAll();
+    }
+
+    public function getPaginatedWithAge(int $perPage = 10): array
+    {
+        return $this->buildPatientWithAgeQuery()->paginate($perPage);
+    }
+
+    public function findWithAge(int $id): ?array
+    {
+        return $this->buildPatientWithAgeQuery()
+            ->where('patients.id', $id)
+            ->first();
+    }
+
+    public function getByParentWithAge(int $parentId, int $perPage = 10): array
+    {
+        return $this->buildPatientWithAgeQuery()
+            ->where('patients.parent_id', $parentId)
+            ->paginate($perPage);
+    }
+
+    private function buildPatientWithAgeQuery()
+    {
+        return $this->select(
+            "patients.*, users.name as parent_name, users.email as parent_email,
+            CONCAT(
+                TIMESTAMPDIFF(YEAR, patients.tanggal_lahir, CURRENT_DATE()),
+                ' tahun ',
+                MOD(TIMESTAMPDIFF(MONTH, patients.tanggal_lahir, CURRENT_DATE()), 12),
+                ' bulan'
+            ) AS usia"
+        )->join('users', 'users.id = patients.parent_id', 'left');
     }
 }

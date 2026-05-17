@@ -16,11 +16,17 @@ class UserController extends ResourceController
 
     public function index()
     {
-        $perPage = $this->request->getGet('per_page') ?? 10;
+        $perPage = max(1, (int) ($this->request->getGet('per_page') ?? 10));
+        $page = max(1, (int) ($this->request->getGet('page') ?? 1));
+        $searchTerm = trim((string) ($this->request->getGet('searchTerm') ?? ''));
+        $status = trim((string) ($this->request->getGet('status') ?? ''));
+        $result = $this->userService->list($perPage, $page, $searchTerm, $status);
+
         return $this->respond([
             'status' => 'success',
             'message' => 'Users data fetched',
-            'data' => $this->userService->list($perPage),
+            'data' => $result['data'],
+            'meta' => $result['meta'],
             'errors' => null
         ]);
     }

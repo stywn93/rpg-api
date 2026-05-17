@@ -16,6 +16,7 @@ class UserModel extends Model
         'name',
         'email',
         'phone',
+        'alamat',
         'password',
         'role',
         'status'
@@ -32,10 +33,54 @@ class UserModel extends Model
     protected $validationRules = [
         'name' => 'required|min_length[3]',
         'email' => 'required|valid_email|is_unique[users.email,id,{id}]',
+        'alamat' => 'permit_empty|string',
         'password' => 'required|min_length[6]',
+        'role' => 'permit_empty|in_list[admin,user]',
 
     ];
 
     protected $validationMessages = [];
     protected $skipValidation = false;
+
+    public function searchPaginated(int $perPage = 10, ?int $page = null, ?string $searchTerm = null, ?string $status = null): array
+    {
+        $searchTerm = is_string($searchTerm) ? trim($searchTerm) : '';
+        $status = is_string($status) ? trim($status) : '';
+
+        if ($status !== '') {
+            $this->where('status', $status);
+        }
+
+        if ($searchTerm !== '') {
+            $this->groupStart()
+                ->like('name', $searchTerm)
+                ->orLike('email', $searchTerm)
+                ->orLike('phone', $searchTerm)
+                ->orLike('alamat', $searchTerm)
+                ->orLike('role', $searchTerm)
+                ->orLike('status', $searchTerm)
+                ->groupEnd();
+        }
+
+        return $this->paginate($perPage, 'default', $page);
+    }
+
+    public function getPaginationMeta(string $group = 'default'): array
+    {
+        if ($this->pager === null) {
+            return [
+                'current_page' => 1,
+                'per_page' => 0,
+                'total' => 0,
+                'last_page' => 1,
+            ];
+        }
+
+        return [
+            'current_page' => $this->pager->getCurrentPage($group),
+            'per_page' => $this->pager->getPerPage($group),
+            'total' => $this->pager->getTotal($group),
+            'last_page' => $this->pager->getPageCount($group),
+        ];
+    }
 }

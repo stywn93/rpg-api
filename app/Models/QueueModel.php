@@ -15,6 +15,7 @@ class QueueModel extends Model
     protected $allowedFields = [
         'tanggal_kunjungan',
         'patient_id',
+        'service_type_ids',
         'nomor_antrian',
         'status',
     ];
@@ -24,18 +25,52 @@ class QueueModel extends Model
     protected $validationRules = [
         'tanggal_kunjungan' => 'required|valid_date[Y-m-d]',
         'patient_id'        => 'permit_empty|integer|is_not_unique[patients.id]',
+        'service_type_ids'  => 'required|regex_match[/^\d+(,\d+)*$/]',
         'nomor_antrian'     => 'permit_empty|integer|greater_than[0]',
         'status'            => 'required|in_list[booked,checked_in,called,served,finished,no_show,cancelled]',
     ];
 
     protected $skipValidation = false;
 
-    public function getQueueListWithPatient(int $perPage = 10, ?string $tanggal = null): array
+    public function getQueueListWithPatient(
+        int $perPage = 10,
+        ?string $tanggal = null,
+        ?string $status = null,
+        ?string $nama = null,
+        ?array $serviceTypeIds = null
+    ): array
     {
         $builder = $this->buildQueuePatientQuery();
+        $status = is_string($status) ? trim($status) : '';
+        $nama = is_string($nama) ? trim($nama) : '';
 
         if ($tanggal !== null && $tanggal !== '') {
             $builder->where('queue.tanggal_kunjungan', $tanggal);
+        }
+
+        if ($status !== '') {
+            $builder->where('queue.status', $status);
+        }
+
+        if ($nama !== '') {
+            $builder->like('patients.nama', $nama);
+        }
+
+        if (is_array($serviceTypeIds) && $serviceTypeIds !== []) {
+            $builder->groupStart();
+
+            foreach (array_values(array_unique($serviceTypeIds)) as $index => $serviceTypeId) {
+                $condition = 'FIND_IN_SET(' . (int) $serviceTypeId . ', queue.service_type_ids) > 0';
+
+                if ($index === 0) {
+                    $builder->where($condition, null, false);
+                    continue;
+                }
+
+                $builder->orWhere($condition, null, false);
+            }
+
+            $builder->groupEnd();
         }
 
         return $builder
@@ -89,6 +124,7 @@ class QueueModel extends Model
         return $this->select(
             "queue.id,
             queue.patient_id,
+            queue.service_type_ids,
             queue.nomor_antrian AS nomor,
             queue.nomor_antrian,
             queue.tanggal_kunjungan,

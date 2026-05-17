@@ -23,12 +23,12 @@ class PatientService
 
     public function list($perPage = 10)
     {
-        return $this->patientModel->paginate((int) $perPage);
+        return $this->patientModel->getPaginatedWithAge((int) $perPage);
     }
 
     public function find($id)
     {
-        return $this->patientModel->find($id);
+        return $this->patientModel->findWithAge((int) $id);
     }
 
     public function create($data)
@@ -50,7 +50,7 @@ class PatientService
                 'code' => 400,
             ];
         }
-        return $this->patientModel->find($this->patientModel->getInsertID());
+        return $this->patientModel->findWithAge((int) $this->patientModel->getInsertID());
     }
 
     public function update($id, $data)
@@ -82,7 +82,7 @@ class PatientService
             ];
         }
 
-        return $this->patientModel->find($id);
+        return $this->patientModel->findWithAge((int) $id);
     }
 
     public function delete($id)
@@ -99,7 +99,7 @@ class PatientService
     }
 
     public function getByParent($parentID){
-        return $this->patientModel->where('parent_id', $parentID)->paginate(10);
+        return $this->patientModel->getByParentWithAge((int) $parentID, 10);
     }
 
     private function preparePayload($data): array

@@ -35,8 +35,8 @@ class CreateUsersTable extends Migration
             ],
             'role' => [
                 'type'       => 'ENUM',
-                'constraint' => ['parent', 'petugas', 'admin', 'pimpinan'],
-                'default'    => 'parent',
+                'constraint' => ['admin', 'user'],
+                'default'    => 'user',
             ],
             'status' => [
                 'type'       => 'ENUM',
