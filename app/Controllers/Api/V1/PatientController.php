@@ -97,9 +97,6 @@ class PatientController extends ResourceController
     public function showByParent($parentID = null)
     {
         $patients = $this->patientService->getByParent($parentID);
-        if (!$patients) {
-            return $this->failNotFound("patient not found");
-        }
         return $this->respond([
             'status' => 'success',
             'message' => 'patient data fetched',
