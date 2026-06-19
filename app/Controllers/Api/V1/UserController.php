@@ -84,6 +84,32 @@ class UserController extends ResourceController
 
     }
 
+    public function updatePassword($id = null)
+    {
+        $data = $this->request->getJSON(true);
+
+        if (!isset($data['password']) || empty($data['password'])) {
+            return $this->failValidationErrors('Password is required');
+        }
+
+        $result = $this->userService->update($id, ['password' => $data['password']]);
+
+        if (isset($result['error'])) {
+            if (($result['code'] ?? 500) === 404) {
+                return $this->failNotFound($result['error']);
+            }
+
+            return $this->fail($result['error'], $result['code'] ?? 400);
+        }
+
+        return $this->respond([
+            'status' => 'success',
+            'message' => 'Password updated successfully',
+            'data' => null,
+            'errors' => null
+        ]);
+    }
+
     public function delete($id = null){
         $user = $this->userService->delete($id);
         if (isset($user['error'])) {

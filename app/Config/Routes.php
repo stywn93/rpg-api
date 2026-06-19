@@ -13,6 +13,7 @@ $routes->group('api/v1', ['namespace' => 'App\Controllers\Api\V1', 'filter' => '
 });
 $routes->group('api/v1', ['namespace' => 'App\Controllers\Api\V1', 'filter' => 'jwt:admin'], function ($routes) {
     $routes->resource('users', ['controller' => 'UserController']);
+    $routes->patch('users/(:num)/password', 'UserController::updatePassword/$1');
     $routes->post('users/(:num)/activate/', 'UserController::activate/$1');
     $routes->post('users/(:num)/suspend', 'UserController::suspend/$1');
 
