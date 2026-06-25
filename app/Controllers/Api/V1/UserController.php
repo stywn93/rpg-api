@@ -20,7 +20,8 @@ class UserController extends ResourceController
         $page = max(1, (int) ($this->request->getGet('page') ?? 1));
         $searchTerm = trim((string) ($this->request->getGet('searchTerm') ?? ''));
         $status = trim((string) ($this->request->getGet('status') ?? ''));
-        $result = $this->userService->list($perPage, $page, $searchTerm, $status);
+        $role = trim((string) ($this->request->getGet('role') ?? ''));
+        $result = $this->userService->list($perPage, $page, $searchTerm, $status, $role);
 
         return $this->respond([
             'status' => 'success',

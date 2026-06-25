@@ -42,13 +42,18 @@ class UserModel extends Model
     protected $validationMessages = [];
     protected $skipValidation = false;
 
-    public function searchPaginated(int $perPage = 10, ?int $page = null, ?string $searchTerm = null, ?string $status = null): array
+    public function searchPaginated(int $perPage = 10, ?int $page = null, ?string $searchTerm = null, ?string $status = null, ?string $role = null): array
     {
         $searchTerm = is_string($searchTerm) ? trim($searchTerm) : '';
         $status = is_string($status) ? trim($status) : '';
+        $role = is_string($role) ? trim($role) : '';
 
         if ($status !== '') {
             $this->where('status', $status);
+        }
+
+        if ($role !== '') {
+            $this->where('role', $role);
         }
 
         if ($searchTerm !== '') {
