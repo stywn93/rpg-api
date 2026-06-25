@@ -20,7 +20,7 @@ final class UserServiceTest extends CIUnitTestCase
 
         $userModel->expects($this->once())
             ->method('searchPaginated')
-            ->with(15, 2, 'admin', 'active')
+            ->with(15, 2, 'admin', 'active', null)
             ->willReturn([['id' => 1]]);
 
         $userModel->expects($this->once())

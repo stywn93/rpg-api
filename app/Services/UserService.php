@@ -10,12 +10,13 @@ class UserService
         $this->userModel = new UserModel();
     }
 
-    public function list($perPage = 10, $page = null, $searchTerm = null, $status = null){
+    public function list($perPage = 10, $page = null, $searchTerm = null, $status = null, $role = null){
         $users = $this->userModel->searchPaginated(
             (int) $perPage,
             $page !== null ? (int) $page : null,
             $searchTerm,
-            $status
+            $status,
+            $role
         );
 
         return [
