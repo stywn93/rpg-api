@@ -124,8 +124,8 @@ class PatientService
     }
 
     // New Query Builder for v_patients view
-    public function listWithParents(): array
+    public function listWithParents(?int $parentId = null): array
     {
-        return $this->patientModel->getAllFromView();
+        return $this->patientModel->getAllFromView($parentId);
     }
 }

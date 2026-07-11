@@ -31,6 +31,10 @@ $routes->group('api/v1', ['namespace' => 'App\Controllers\Api\V1', 'filter' => '
 
     // new route for v_patients view
     $routes->get('patients/with-parents', 'PatientController::listWithParents');
+    
+});
+$routes->group('api/v1', ['namespace' => 'App\Controllers\Api\V1', 'filter' => ['jwt:user']], function ($routes) {
+    $routes->get('patients/with-parents/(:num)', 'PatientController::listWithParents/$1');
 });
 
 $routes->set404Override('\App\Controllers\Api\V1\ErrorController::notFound');

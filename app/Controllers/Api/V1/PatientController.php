@@ -107,12 +107,12 @@ class PatientController extends ResourceController
 
     // New Query Builder for v_patients view
 
-    public function listWithParents()
+    public function listWithParents(?int $parentId = null)
     {
         return $this->respond([
             'status' => 'success',
             'message' => 'patients with parents data fetched',
-            'data' => $this->patientService->listWithParents(),
+            'data' => $this->patientService->listWithParents($parentId),
             'errors' => null
         ]);
     }

@@ -75,8 +75,14 @@ class PatientModel extends Model
     }
 
     // New Query Builder for v_patients view
-    public function getAllFromView(): array
+    public function getAllFromView(?int $parentId = null): array
     {
-        return $this->db->table('v_patients')->get()->getResultArray();
+        $builder = $this->db->table('v_patients');
+
+        if ($parentId !== null) {
+            $builder->where('parent_id', $parentId);
+        }
+
+        return $builder->get()->getResultArray();
     }
 }
