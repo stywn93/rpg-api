@@ -105,6 +105,18 @@ class PatientController extends ResourceController
         ]);
     }
 
+    // New Query Builder for v_patients view
+
+    public function listWithParents()
+    {
+        return $this->respond([
+            'status' => 'success',
+            'message' => 'patients with parents data fetched',
+            'data' => $this->patientService->listWithParents(),
+            'errors' => null
+        ]);
+    }
+
     private function getRequestData(): array
     {
         $json = $this->request->getJSON(true);

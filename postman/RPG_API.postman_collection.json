@@ -1,0 +1,806 @@
+{
+  "info": {
+    "name": "RPG API",
+    "description": "API collection generated from Routes.php — includes Auth (rate-limited) and Protected (JWT) endpoints.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:8080",
+      "type": "string"
+    },
+    {
+      "key": "token",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Auth (Rate Limited)",
+      "description": "Public endpoints protected by rate limiter. No JWT required.",
+      "item": [
+        {
+          "name": "Register",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Accept", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"user@example.com\",\n  \"password\": \"secret123\",\n  \"name\": \"John Doe\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/auth/register",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "auth", "register"]
+            }
+          }
+        },
+        {
+          "name": "Login",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Accept", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"user@example.com\",\n  \"password\": \"secret123\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/auth/login",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "auth", "login"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Protected (JWT)",
+      "description": "Endpoints requiring JWT authentication. Token is sent via Authorization header.",
+      "item": [
+        {
+          "name": "Users",
+          "item": [
+            {
+              "name": "List Users",
+              "request": {
+                "method": "GET",
+                "header": [
+                  { "key": "Authorization", "value": "Bearer {{token}}" },
+                  { "key": "Accept", "value": "application/json" }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/v1/users",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "v1", "users"]
+                }
+              }
+            },
+            {
+              "name": "Create User",
+              "request": {
+                "method": "POST",
+                "header": [
+                  { "key": "Authorization", "value": "Bearer {{token}}" },
+                  { "key": "Content-Type", "value": "application/json" },
+                  { "key": "Accept", "value": "application/json" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"email\": \"newuser@example.com\",\n  \"password\": \"secret123\",\n  \"name\": \"New User\",\n  \"role\": \"user\"\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/v1/users",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "v1", "users"]
+                }
+              }
+            },
+            {
+              "name": "Show User",
+              "request": {
+                "method": "GET",
+                "header": [
+                  { "key": "Authorization", "value": "Bearer {{token}}" },
+                  { "key": "Accept", "value": "application/json" }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/v1/users/1",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "v1", "users", "1"]
+                }
+              }
+            },
+            {
+              "name": "Update User",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  { "key": "Authorization", "value": "Bearer {{token}}" },
+                  { "key": "Content-Type", "value": "application/json" },
+                  { "key": "Accept", "value": "application/json" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Updated Name\",\n  \"email\": \"updated@example.com\"\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/v1/users/1",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "v1", "users", "1"]
+                }
+              }
+            },
+            {
+              "name": "Delete User",
+              "request": {
+                "method": "DELETE",
+                "header": [
+                  { "key": "Authorization", "value": "Bearer {{token}}" },
+                  { "key": "Accept", "value": "application/json" }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/v1/users/1",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "v1", "users", "1"]
+                }
+              }
+            },
+            {
+              "name": "Update Password",
+              "request": {
+                "method": "PATCH",
+                "header": [
+                  { "key": "Authorization", "value": "Bearer {{token}}" },
+                  { "key": "Content-Type", "value": "application/json" },
+                  { "key": "Accept", "value": "application/json" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"current_password\": \"oldpass\",\n  \"new_password\": \"newpass123\"\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/v1/users/1/password",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "v1", "users", "1", "password"]
+                }
+              }
+            },
+            {
+              "name": "Activate User",
+              "request": {
+                "method": "POST",
+                "header": [
+                  { "key": "Authorization", "value": "Bearer {{token}}" },
+                  { "key": "Content-Type", "value": "application/json" },
+                  { "key": "Accept", "value": "application/json" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/v1/users/1/activate",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "v1", "users", "1", "activate"]
+                }
+              }
+            },
+            {
+              "name": "Suspend User",
+              "request": {
+                "method": "POST",
+                "header": [
+                  { "key": "Authorization", "value": "Bearer {{token}}" },
+                  { "key": "Content-Type", "value": "application/json" },
+                  { "key": "Accept", "value": "application/json" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"reason\": \"Violation of terms\"\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/v1/users/1/suspend",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "v1", "users", "1", "suspend"]
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "Patients",
+          "item": [
+            {
+              "name": "List Patients",
+              "request": {
+                "method": "GET",
+                "header": [
+                  { "key": "Authorization", "value": "Bearer {{token}}" },
+                  { "key": "Accept", "value": "application/json" }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/v1/patients",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "v1", "patients"]
+                }
+              }
+            },
+            {
+              "name": "Create Patient",
+              "request": {
+                "method": "POST",
+                "header": [
+                  { "key": "Authorization", "value": "Bearer {{token}}" },
+                  { "key": "Content-Type", "value": "application/json" },
+                  { "key": "Accept", "value": "application/json" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Jane Smith\",\n  \"date_of_birth\": \"2020-01-15\",\n  \"parent_id\": 1,\n  \"notes\": \"Initial checkup\"\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/v1/patients",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "v1", "patients"]
+                }
+              }
+            },
+            {
+              "name": "Show Patient",
+              "request": {
+                "method": "GET",
+                "header": [
+                  { "key": "Authorization", "value": "Bearer {{token}}" },
+                  { "key": "Accept", "value": "application/json" }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/v1/patients/1",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "v1", "patients", "1"]
+                }
+              }
+            },
+            {
+              "name": "Show Patient by Parent",
+              "request": {
+                "method": "GET",
+                "header": [
+                  { "key": "Authorization", "value": "Bearer {{token}}" },
+                  { "key": "Accept", "value": "application/json" }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/v1/patients/parent/1",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "v1", "patients", "parent", "1"]
+                }
+              }
+            },
+            {
+              "name": "Update Patient",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  { "key": "Authorization", "value": "Bearer {{token}}" },
+                  { "key": "Content-Type", "value": "application/json" },
+                  { "key": "Accept", "value": "application/json" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Jane Smith Updated\",\n  \"notes\": \"Follow-up visit\"\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/v1/patients/1",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "v1", "patients", "1"]
+                }
+              }
+            },
+            {
+              "name": "Delete Patient",
+              "request": {
+                "method": "DELETE",
+                "header": [
+                  { "key": "Authorization", "value": "Bearer {{token}}" },
+                  { "key": "Accept", "value": "application/json" }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/v1/patients/1",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "v1", "patients", "1"]
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "Schedules",
+          "item": [
+            {
+              "name": "List Schedules",
+              "request": {
+                "method": "GET",
+                "header": [
+                  { "key": "Authorization", "value": "Bearer {{token}}" },
+                  { "key": "Accept", "value": "application/json" }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/v1/schedules",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "v1", "schedules"]
+                }
+              }
+            },
+            {
+              "name": "Create Schedule",
+              "request": {
+                "method": "POST",
+                "header": [
+                  { "key": "Authorization", "value": "Bearer {{token}}" },
+                  { "key": "Content-Type", "value": "application/json" },
+                  { "key": "Accept", "value": "application/json" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"patient_id\": 1,\n  \"service_type_id\": 1,\n  \"scheduled_date\": \"2026-07-15\",\n  \"notes\": \"Regular checkup\"\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/v1/schedules",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "v1", "schedules"]
+                }
+              }
+            },
+            {
+              "name": "Show Schedule",
+              "request": {
+                "method": "GET",
+                "header": [
+                  { "key": "Authorization", "value": "Bearer {{token}}" },
+                  { "key": "Accept", "value": "application/json" }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/v1/schedules/1",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "v1", "schedules", "1"]
+                }
+              }
+            },
+            {
+              "name": "Update Schedule",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  { "key": "Authorization", "value": "Bearer {{token}}" },
+                  { "key": "Content-Type", "value": "application/json" },
+                  { "key": "Accept", "value": "application/json" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"scheduled_date\": \"2026-07-16\",\n  \"notes\": \"Rescheduled\"\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/v1/schedules/1",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "v1", "schedules", "1"]
+                }
+              }
+            },
+            {
+              "name": "Delete Schedule",
+              "request": {
+                "method": "DELETE",
+                "header": [
+                  { "key": "Authorization", "value": "Bearer {{token}}" },
+                  { "key": "Accept", "value": "application/json" }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/v1/schedules/1",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "v1", "schedules", "1"]
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "Service Types",
+          "item": [
+            {
+              "name": "List Service Types",
+              "request": {
+                "method": "GET",
+                "header": [
+                  { "key": "Authorization", "value": "Bearer {{token}}" },
+                  { "key": "Accept", "value": "application/json" }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/v1/servicetypes",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "v1", "servicetypes"]
+                }
+              }
+            },
+            {
+              "name": "Create Service Type",
+              "request": {
+                "method": "POST",
+                "header": [
+                  { "key": "Authorization", "value": "Bearer {{token}}" },
+                  { "key": "Content-Type", "value": "application/json" },
+                  { "key": "Accept", "value": "application/json" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"General Checkup\",\n  \"description\": \"Routine health examination\",\n  \"duration_minutes\": 30\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/v1/servicetypes",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "v1", "servicetypes"]
+                }
+              }
+            },
+            {
+              "name": "Show Service Type",
+              "request": {
+                "method": "GET",
+                "header": [
+                  { "key": "Authorization", "value": "Bearer {{token}}" },
+                  { "key": "Accept", "value": "application/json" }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/v1/servicetypes/1",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "v1", "servicetypes", "1"]
+                }
+              }
+            },
+            {
+              "name": "Update Service Type",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  { "key": "Authorization", "value": "Bearer {{token}}" },
+                  { "key": "Content-Type", "value": "application/json" },
+                  { "key": "Accept", "value": "application/json" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Extended Checkup\",\n  \"duration_minutes\": 45\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/v1/servicetypes/1",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "v1", "servicetypes", "1"]
+                }
+              }
+            },
+            {
+              "name": "Delete Service Type",
+              "request": {
+                "method": "DELETE",
+                "header": [
+                  { "key": "Authorization", "value": "Bearer {{token}}" },
+                  { "key": "Accept", "value": "application/json" }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/v1/servicetypes/1",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "v1", "servicetypes", "1"]
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "Queues",
+          "item": [
+            {
+              "name": "List Queues",
+              "request": {
+                "method": "GET",
+                "header": [
+                  { "key": "Authorization", "value": "Bearer {{token}}" },
+                  { "key": "Accept", "value": "application/json" }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/v1/queues",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "v1", "queues"]
+                }
+              }
+            },
+            {
+              "name": "Filter Queues by Date",
+              "request": {
+                "method": "GET",
+                "header": [
+                  { "key": "Authorization", "value": "Bearer {{token}}" },
+                  { "key": "Accept", "value": "application/json" }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/v1/queues/date/2026-07-11",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "v1", "queues", "date", "2026-07-11"]
+                }
+              }
+            },
+            {
+              "name": "Create Queue",
+              "request": {
+                "method": "POST",
+                "header": [
+                  { "key": "Authorization", "value": "Bearer {{token}}" },
+                  { "key": "Content-Type", "value": "application/json" },
+                  { "key": "Accept", "value": "application/json" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"patient_id\": 1,\n  \"schedule_id\": 1,\n  \"queue_date\": \"2026-07-11\",\n  \"status\": \"waiting\",\n  \"notes\": \"Walk-in patient\"\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/v1/queues",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "v1", "queues"]
+                }
+              }
+            },
+            {
+              "name": "Show Queue",
+              "request": {
+                "method": "GET",
+                "header": [
+                  { "key": "Authorization", "value": "Bearer {{token}}" },
+                  { "key": "Accept", "value": "application/json" }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/v1/queues/1",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "v1", "queues", "1"]
+                }
+              }
+            },
+            {
+              "name": "Update Queue",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  { "key": "Authorization", "value": "Bearer {{token}}" },
+                  { "key": "Content-Type", "value": "application/json" },
+                  { "key": "Accept", "value": "application/json" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"status\": \"in_progress\",\n  \"notes\": \"Patient is being attended\"\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/v1/queues/1",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "v1", "queues", "1"]
+                }
+              }
+            },
+            {
+              "name": "Delete Queue",
+              "request": {
+                "method": "DELETE",
+                "header": [
+                  { "key": "Authorization", "value": "Bearer {{token}}" },
+                  { "key": "Accept", "value": "application/json" }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/v1/queues/1",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "v1", "queues", "1"]
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "Queue Logs",
+          "item": [
+            {
+              "name": "List Queue Logs",
+              "request": {
+                "method": "GET",
+                "header": [
+                  { "key": "Authorization", "value": "Bearer {{token}}" },
+                  { "key": "Accept", "value": "application/json" }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/v1/queuelogs",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "v1", "queuelogs"]
+                }
+              }
+            },
+            {
+              "name": "Create Queue Log",
+              "request": {
+                "method": "POST",
+                "header": [
+                  { "key": "Authorization", "value": "Bearer {{token}}" },
+                  { "key": "Content-Type", "value": "application/json" },
+                  { "key": "Accept", "value": "application/json" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"queue_id\": 1,\n  \"action\": \"status_change\",\n  \"from_status\": \"waiting\",\n  \"to_status\": \"in_progress\",\n  \"performed_by\": 1,\n  \"notes\": \"Nurse started examination\"\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/v1/queuelogs",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "v1", "queuelogs"]
+                }
+              }
+            },
+            {
+              "name": "Show Queue Log",
+              "request": {
+                "method": "GET",
+                "header": [
+                  { "key": "Authorization", "value": "Bearer {{token}}" },
+                  { "key": "Accept", "value": "application/json" }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/v1/queuelogs/1",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "v1", "queuelogs", "1"]
+                }
+              }
+            },
+            {
+              "name": "Update Queue Log",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  { "key": "Authorization", "value": "Bearer {{token}}" },
+                  { "key": "Content-Type", "value": "application/json" },
+                  { "key": "Accept", "value": "application/json" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"notes\": \"Corrected log entry\"\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/v1/queuelogs/1",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "v1", "queuelogs", "1"]
+                }
+              }
+            },
+            {
+              "name": "Delete Queue Log",
+              "request": {
+                "method": "DELETE",
+                "header": [
+                  { "key": "Authorization", "value": "Bearer {{token}}" },
+                  { "key": "Accept", "value": "application/json" }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/v1/queuelogs/1",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "v1", "queuelogs", "1"]
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "Growth Records",
+          "item": [
+            {
+              "name": "List Growth Records",
+              "request": {
+                "method": "GET",
+                "header": [
+                  { "key": "Authorization", "value": "Bearer {{token}}" },
+                  { "key": "Accept", "value": "application/json" }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/v1/growthrecords",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "v1", "growthrecords"]
+                }
+              }
+            },
+            {
+              "name": "Show by Patient",
+              "request": {
+                "method": "GET",
+                "header": [
+                  { "key": "Authorization", "value": "Bearer {{token}}" },
+                  { "key": "Accept", "value": "application/json" }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/v1/growthrecords/patient/1",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "v1", "growthrecords", "patient", "1"]
+                }
+              }
+            },
+            {
+              "name": "Create Growth Record",
+              "request": {
+                "method": "POST",
+                "header": [
+                  { "key": "Authorization", "value": "Bearer {{token}}" },
+                  { "key": "Content-Type", "value": "application/json" },
+                  { "key": "Accept", "value": "application/json" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"patient_id\": 1,\n  \"record_date\": \"2026-07-11\",\n  \"height_cm\": 95.5,\n  \"weight_kg\": 14.2,\n  \"head_circumference_cm\": 48.0,\n  \"notes\": \"Growth checkup\"\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/v1/growthrecords",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "v1", "growthrecords"]
+                }
+              }
+            },
+            {
+              "name": "Show Growth Record",
+              "request": {
+                "method": "GET",
+                "header": [
+                  { "key": "Authorization", "value": "Bearer {{token}}" },
+                  { "key": "Accept", "value": "application/json" }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/v1/growthrecords/1",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "v1", "growthrecords", "1"]
+                }
+              }
+            },
+            {
+              "name": "Update Growth Record",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  { "key": "Authorization", "value": "Bearer {{token}}" },
+                  { "key": "Content-Type", "value": "application/json" },
+                  { "key": "Accept", "value": "application/json" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"height_cm\": 96.0,\n  \"weight_kg\": 14.5,\n  \"notes\": \"Corrected measurements\"\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/v1/growthrecords/1",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "v1", "growthrecords", "1"]
+                }
+              }
+            },
+            {
+              "name": "Delete Growth Record",
+              "request": {
+                "method": "DELETE",
+                "header": [
+                  { "key": "Authorization", "value": "Bearer {{token}}" },
+                  { "key": "Accept", "value": "application/json" }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/v1/growthrecords/1",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "v1", "growthrecords", "1"]
+                }
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
