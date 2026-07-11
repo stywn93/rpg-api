@@ -28,6 +28,9 @@ $routes->group('api/v1', ['namespace' => 'App\Controllers\Api\V1', 'filter' => '
     $routes->resource('queuelogs', ['controller' => 'QueueLogController']);
     $routes->get('growthrecords/patient/(:num)', 'GrowthRecordController::showByPatient/$1');
     $routes->resource('growthrecords', ['controller' => 'GrowthRecordController']);
+
+    // new route for v_patients view
+    $routes->get('patients/with-parents', 'PatientController::listWithParents');
 });
 
 $routes->set404Override('\App\Controllers\Api\V1\ErrorController::notFound');

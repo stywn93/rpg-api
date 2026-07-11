@@ -122,4 +122,10 @@ class PatientService
 
         return $payload;
     }
+
+    // New Query Builder for v_patients view
+    public function listWithParents(): array
+    {
+        return $this->patientModel->getAllFromView();
+    }
 }

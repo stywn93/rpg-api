@@ -83,4 +83,10 @@ class PatientModel extends Model
             ) AS usia"
         )->join('users', 'users.id = patients.parent_id', 'left');
     }
+
+    // New Query Builder for v_patients view
+    public function getAllFromView(): array
+    {
+        return $this->db->table('v_patients')->get()->getResultArray();
+    }
 }
