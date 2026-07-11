@@ -37,8 +37,4 @@ class ServiceTypeModel extends Model
     | Scope Aktif
     |--------------------------------------------------------------------------
     */
-    public function getActive()
-    {
-        return $this->where('aktif', 1)->findAll();
-    }
 }

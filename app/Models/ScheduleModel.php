@@ -42,27 +42,10 @@ class ScheduleModel extends Model
     | Join Service Type
     |--------------------------------------------------------------------------
     */
-    public function getWithService($id = null)
-    {
-        $builder = $this->select('schedules.*, service_types.nama_layanan')
-            ->join('service_types', 'service_types.id = schedules.service_type_id');
-
-        if ($id !== null) {
-            return $builder->where('schedules.id', $id)->first();
-        }
-
-        return $builder->findAll();
-    }
 
     /*
     |--------------------------------------------------------------------------
     | Get Jadwal yang Masih Open
     |--------------------------------------------------------------------------
     */
-    public function getOpenSchedules()
-    {
-        return $this->where('status', 'open')
-            ->where('tanggal >=', date('Y-m-d'))
-            ->findAll();
-    }
 }

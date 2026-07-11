@@ -41,16 +41,6 @@ class PatientModel extends Model
     | Custom Query Join Parent
     |--------------------------------------------------------------------------
     */
-    public function getWithParent($id = null)
-    {
-        $builder = $this->buildPatientWithAgeQuery();
-
-        if ($id !== null) {
-            return $builder->where('patients.id', $id)->first();
-        }
-
-        return $builder->findAll();
-    }
 
     public function getPaginatedWithAge(int $perPage = 10): array
     {
