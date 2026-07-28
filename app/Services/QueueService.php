@@ -290,4 +290,16 @@ class QueueService
 
         return $queue;
     }
+
+    // new query builder for v_queues view
+    public function listFromView(
+        int $perPage = 10,
+        ?string $tanggal = null,
+        ?string $status = null,
+        ?string $nama = null,
+        ?array $serviceTypeIds = null
+    ): array
+    {
+        return $this->queueModel->getAllFromView($perPage, $tanggal, $status, $nama, $serviceTypeIds);
+    }
 }

@@ -146,4 +146,47 @@ class QueueModel extends Model
             ->join('users', 'users.id = patients.parent_id', 'left')
             ->where('patients.deleted_at', null);
     }
+
+    // new query builder for v_queues view
+    public function getAllFromView(?string $perPage, ?string $tanggal = null, ?string $status = null, ?string $nama = null, ?array $serviceTypeIds = null): array
+    {
+      $builder = $this->db->table('v_queues');
+      
+      if ($tanggal !== null && $tanggal !== '') {
+            $builder->where('tanggal_kunjungan', $tanggal);
+        }
+
+        if ($status !== null && $status !== '') {
+            $builder->where('status', $status);
+        }
+
+        if ($nama !== null && $nama !== '') {
+            $builder->like('nama_pasien', $nama);
+        }
+
+        if (is_array($serviceTypeIds) && !empty($serviceTypeIds)) {
+            $builder->groupStart();
+
+            foreach (array_values(array_unique($serviceTypeIds)) as $index => $serviceTypeId) {
+                $condition = 'FIND_IN_SET(' . (int) $serviceTypeId . ', service_type_ids) > 0';
+
+                if ($index === 0) {
+                    $builder->where($condition, null, false);
+                    continue;
+                }
+
+                $builder->orWhere($condition, null, false);
+            }
+
+            $builder->groupEnd();
+        }
+         
+
+        return $builder
+            ->orderBy('tanggal_kunjungan', 'DESC')
+            ->orderBy('nomor_antrian', 'ASC')
+            ->get()
+            ->getResultArray();
+
+    }
 }

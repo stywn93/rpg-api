@@ -223,4 +223,20 @@ class QueueController extends ResourceController
             'values' => $normalized === [] ? null : $normalized,
         ];
     }
+
+    // new query builder for v_queues view
+    public function listWithPatients(
+        int $perPage = 10,
+        ?string $tanggal = null,
+        ?string $status = null,
+        ?string $nama = null,
+        ?array $serviceTypeIds = null
+    ) {
+        return $this->respond([
+            'status' => 'success',
+            'message' => 'queues with patients data fetched',
+            'data' => $this->queueService->listFromView($perPage, $tanggal, $status, $nama, $serviceTypeIds),
+            'errors' => null
+        ]);
+    }
 }
