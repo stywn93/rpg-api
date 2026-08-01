@@ -1,0 +1,421 @@
+-- MySQL dump 10.13  Distrib 8.0.27, for macos11 (arm64)
+--
+-- Host: 127.0.0.1    Database: db
+-- ------------------------------------------------------
+-- Server version	8.0.45
+
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!50503 SET NAMES utf8mb4 */;
+/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
+/*!40103 SET TIME_ZONE='+00:00' */;
+/*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
+/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
+/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
+/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
+
+--
+-- Table structure for table `growth_records`
+--
+
+DROP TABLE IF EXISTS `growth_records`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `growth_records` (
+  `id` int unsigned NOT NULL AUTO_INCREMENT,
+  `patient_id` int unsigned NOT NULL,
+  `berat_badan` decimal(5,2) NOT NULL COMMENT 'Dalam kg',
+  `tinggi_badan` decimal(5,2) NOT NULL COMMENT 'Dalam cm',
+  `status_gizi` varchar(100) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `keadaan_umum` varchar(100) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `tanggal_pemeriksaan` date NOT NULL,
+  `keterangan` text COLLATE utf8mb4_general_ci,
+  `created_at` datetime DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `patient_id` (`patient_id`),
+  CONSTRAINT `growth_records_patient_id_foreign` FOREIGN KEY (`patient_id`) REFERENCES `patients` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=17 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `growth_records`
+--
+
+LOCK TABLES `growth_records` WRITE;
+/*!40000 ALTER TABLE `growth_records` DISABLE KEYS */;
+INSERT INTO `growth_records` VALUES (2,2,3.20,100.00,'Baik','kurang baik','2026-02-08','berat badan anak rendah','2026-05-02 22:44:53','2026-05-02 22:44:53'),(5,2,12.20,12.30,'baik','baik','2026-05-03',NULL,'2026-05-03 02:43:19','2026-05-03 02:43:19'),(6,2,11.10,11.10,'baik','baik','2026-05-03','abcd','2026-05-03 02:45:21','2026-05-03 02:45:21'),(7,2,12.30,11.10,'baik','baik','2026-05-03','jika','2026-05-03 03:08:27','2026-05-03 03:08:27'),(8,2,12.20,12.30,'baik','baik','2026-05-03','abcef','2026-05-03 03:10:19','2026-05-03 03:10:19'),(9,2,12.30,12.30,'baik','baik','2026-05-03','','2026-05-03 03:11:25','2026-05-03 03:11:25'),(10,2,11.10,12.30,'baik','baik','2026-05-03','abcd','2026-05-03 03:14:05','2026-05-03 03:14:05'),(11,2,11.10,11.10,'baik','baik','2026-05-03','','2026-05-03 03:16:16','2026-05-03 03:16:16'),(12,2,12.30,12.10,'baik','baik','2026-05-03','','2026-05-03 03:24:11','2026-05-03 03:24:11'),(13,2,3.20,100.00,'Baik','kurang baik','2026-02-08','berat badan anak rendah','2026-05-03 09:10:01','2026-05-03 09:10:01'),(14,2,3.20,100.00,'Baik','kurang baik','2026-05-05','berat badan anak rendah','2026-05-03 09:10:52','2026-05-03 09:10:52'),(15,3,11.10,12.10,'baik','baik','2026-05-03','','2026-05-03 09:17:51','2026-05-03 09:17:51'),(16,2,11.10,11.10,'baik','baik','2026-05-03','','2026-05-03 09:18:11','2026-05-03 09:18:11');
+/*!40000 ALTER TABLE `growth_records` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `migrations`
+--
+
+DROP TABLE IF EXISTS `migrations`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `migrations` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `version` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
+  `class` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
+  `group` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
+  `namespace` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
+  `time` int NOT NULL,
+  `batch` int unsigned NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=28 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `migrations`
+--
+
+LOCK TABLES `migrations` WRITE;
+/*!40000 ALTER TABLE `migrations` DISABLE KEYS */;
+INSERT INTO `migrations` VALUES (1,'2026-02-16-020555','App\\Database\\Migrations\\CreateUsersTable','default','App',1771207645,1),(2,'2026-02-16-020939','App\\Database\\Migrations\\CreatePatientsTable','default','App',1771207821,2),(3,'2026-02-16-022235','App\\Database\\Migrations\\CreateServiceTypesTable','default','App',1771208601,3),(4,'2026-02-16-022431','App\\Database\\Migrations\\CreateSchedulesTable','default','App',1771208695,4),(5,'2026-02-16-022651','App\\Database\\Migrations\\CreateQueueTable','default','App',1771208885,5),(6,'2026-02-16-022937','App\\Database\\Migrations\\CreateQueueLogsTable','default','App',1771209144,6),(7,'2026-02-16-023636','App\\Database\\Migrations\\CreateGrowthRecordsTable','default','App',1771209417,7),(8,'2026-02-17-000656','App\\Database\\Migrations\\AddDeletedAtUsers','default','App',1771287144,8),(9,'2026-02-26-013110','App\\Database\\Migrations\\AddDeletedAtPatients','default','App',1772142793,9),(10,'2026-02-26-013524','App\\Database\\Migrations\\AddUniqueToNIKPatient','default','App',1772142793,9),(11,'2026-02-26-030135','App\\Database\\Migrations\\ModifySchedulesDate','default','App',1772142793,9),(12,'2026-02-26-061108','App\\Database\\Migrations\\AddUniqueToDaySchedules','default','App',1772142794,9),(13,'2026-02-26-070000','App\\Database\\Migrations\\RemoveUniqueFromDaySchedules','default','App',1772143122,10),(14,'2026-03-02-015918','App\\Database\\Migrations\\AddTriggerQueueLogs','default','App',1772482594,11),(15,'2026-04-19-000000','App\\Database\\Migrations\\RestructureQueueTable','default','App',1776571739,12),(16,'2026-04-19-000001','App\\Database\\Migrations\\AddPatientIdToQueueTable','default','App',1776571893,13),(17,'2026-04-21-000000','App\\Database\\Migrations\\RemoveUnusedPatientColumns','default','App',1776717025,14),(18,'2026-05-02-000000','App\\Database\\Migrations\\AddNomorAntrianToQueueTable','default','App',1777684715,15),(19,'2026-05-03-000001','App\\Database\\Migrations\\AlterGrowthRecordsExaminationFields','default','App',1777761774,16),(20,'2026-05-09-000001','App\\Database\\Migrations\\AddAlamatToUsersTable','default','App',1778336046,17),(21,'2026-05-12-000001','App\\Database\\Migrations\\RestrictUserRolesToAdminAndUser','default','App',1778521251,18),(22,'2026-05-16-000001','App\\Database\\Migrations\\AddServiceTypeIdsToQueueTable','default','App',1778938357,19),(23,'2026-06-29-000001','App\\Database\\Migrations\\AddParentIdToQueueTable','default','App',1782721453,20),(24,'2026-07-11-141752','App\\Database\\Migrations\\CreateVPatients','default','App',1783779618,21),(25,'2026-07-11-223531','App\\Database\\Migrations\\AddAlamatToVPatients','default','App',1783809511,22),(26,'2026-07-11-224533','App\\Database\\Migrations\\AddParentIDtoVPatients','default','App',1783809972,23),(27,'2026-07-12-065402','App\\Database\\Migrations\\CreateVQueue','default','App',1783839375,24);
+/*!40000 ALTER TABLE `migrations` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `patients`
+--
+
+DROP TABLE IF EXISTS `patients`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `patients` (
+  `id` int unsigned NOT NULL AUTO_INCREMENT,
+  `parent_id` int unsigned NOT NULL,
+  `no_kk` varchar(20) COLLATE utf8mb4_general_ci NOT NULL,
+  `nama` varchar(150) COLLATE utf8mb4_general_ci NOT NULL,
+  `tanggal_lahir` date NOT NULL,
+  `jenis_kelamin` enum('L','P') COLLATE utf8mb4_general_ci NOT NULL,
+  `alamat` text COLLATE utf8mb4_general_ci NOT NULL,
+  `created_at` datetime DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  `deleted_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `parent_id` (`parent_id`),
+  CONSTRAINT `patients_parent_id_foreign` FOREIGN KEY (`parent_id`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `patients`
+--
+
+LOCK TABLES `patients` WRITE;
+/*!40000 ALTER TABLE `patients` DISABLE KEYS */;
+INSERT INTO `patients` VALUES (2,2,'3509053001930003','Hasan Abdul Muhsin','2019-01-16','L','Prajekan Lor','2026-02-26 21:54:24','2026-02-26 21:54:24',NULL),(3,3,'3509053001930003','Ihsan Abdul Muhsin','2021-07-24','L','Prajekan Lor','2026-02-26 21:55:21','2026-02-26 21:55:21',NULL);
+/*!40000 ALTER TABLE `patients` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `queue`
+--
+
+DROP TABLE IF EXISTS `queue`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `queue` (
+  `id` int unsigned NOT NULL AUTO_INCREMENT,
+  `tanggal_kunjungan` date NOT NULL,
+  `patient_id` int unsigned DEFAULT NULL,
+  `nomor_antrian` int NOT NULL,
+  `status` enum('booked','checked_in','called','served','finished','no_show','cancelled') COLLATE utf8mb4_general_ci NOT NULL DEFAULT 'booked',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `queue_tanggal_kunjungan_nomor_antrian_unique` (`tanggal_kunjungan`,`nomor_antrian`),
+  KEY `queue_patient_id_index` (`patient_id`),
+  CONSTRAINT `queue_patient_id_foreign` FOREIGN KEY (`patient_id`) REFERENCES `patients` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=20 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `queue`
+--
+
+LOCK TABLES `queue` WRITE;
+/*!40000 ALTER TABLE `queue` DISABLE KEYS */;
+INSERT INTO `queue` VALUES (10,'2026-07-27',2,2,'booked'),(11,'2026-07-27',3,1,'checked_in');
+/*!40000 ALTER TABLE `queue` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `queue_logs`
+--
+
+DROP TABLE IF EXISTS `queue_logs`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `queue_logs` (
+  `id` int unsigned NOT NULL AUTO_INCREMENT,
+  `queue_id` int unsigned NOT NULL,
+  `status_sebelumnya` enum('booked','checked_in','called','served','finished','no_show','cancelled') COLLATE utf8mb4_general_ci NOT NULL,
+  `status_baru` enum('booked','checked_in','called','served','finished','no_show','cancelled') COLLATE utf8mb4_general_ci NOT NULL,
+  `changed_by` int unsigned NOT NULL,
+  `changed_at` datetime NOT NULL DEFAULT '2026-02-16 02:32:24',
+  PRIMARY KEY (`id`),
+  KEY `queue_id` (`queue_id`),
+  KEY `changed_by` (`changed_by`),
+  CONSTRAINT `queue_logs_changed_by_foreign` FOREIGN KEY (`changed_by`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `queue_logs_queue_id_foreign` FOREIGN KEY (`queue_id`) REFERENCES `queue` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `queue_logs`
+--
+
+LOCK TABLES `queue_logs` WRITE;
+/*!40000 ALTER TABLE `queue_logs` DISABLE KEYS */;
+/*!40000 ALTER TABLE `queue_logs` ENABLE KEYS */;
+UNLOCK TABLES;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_0900_ai_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+/*!50003 CREATE*/ /*!50017 DEFINER=`root`@`%`*/ /*!50003 TRIGGER `before_insert_queuelogs` BEFORE INSERT ON `queue_logs` FOR EACH ROW BEGIN
+                DECLARE last_status VARCHAR(255);
+
+                SELECT status_baru
+                INTO last_status
+                FROM queue_logs
+                WHERE queue_id = NEW.queue_id
+                ORDER BY id DESC
+                LIMIT 1;
+
+                IF last_status IS NOT NULL THEN
+                    SET NEW.status_sebelumnya = last_status;
+                END IF;
+
+            END */;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+
+--
+-- Table structure for table `queue_service_types`
+--
+
+DROP TABLE IF EXISTS `queue_service_types`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `queue_service_types` (
+  `id` int unsigned NOT NULL AUTO_INCREMENT,
+  `queue_id` int unsigned NOT NULL,
+  `service_type_id` int unsigned NOT NULL,
+  `created_at` datetime DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `qst_queue_service_unique` (`queue_id`,`service_type_id`),
+  KEY `qst_service_type_id_index` (`service_type_id`),
+  CONSTRAINT `qst_queue_id_foreign` FOREIGN KEY (`queue_id`) REFERENCES `queue` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `qst_service_type_id_foreign` FOREIGN KEY (`service_type_id`) REFERENCES `service_types` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `queue_service_types`
+--
+
+LOCK TABLES `queue_service_types` WRITE;
+/*!40000 ALTER TABLE `queue_service_types` DISABLE KEYS */;
+INSERT INTO `queue_service_types` VALUES (1,10,1,'2026-07-12 06:37:07','2026-07-12 06:37:07'),(2,11,1,'2026-07-12 06:37:07','2026-07-12 06:37:07'),(4,10,2,'2026-07-12 06:37:07','2026-07-12 06:37:07');
+/*!40000 ALTER TABLE `queue_service_types` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `schedules`
+--
+
+DROP TABLE IF EXISTS `schedules`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `schedules` (
+  `id` int unsigned NOT NULL AUTO_INCREMENT,
+  `hari` enum('selasa','rabu','kamis') COLLATE utf8mb4_general_ci NOT NULL,
+  `jam_mulai` time NOT NULL,
+  `jam_selesai` time NOT NULL,
+  `kuota` int NOT NULL,
+  `service_type_id` int unsigned NOT NULL,
+  `status` enum('open','closed') COLLATE utf8mb4_general_ci NOT NULL DEFAULT 'open',
+  `created_at` datetime DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `service_type_id` (`service_type_id`),
+  CONSTRAINT `schedules_service_type_id_foreign` FOREIGN KEY (`service_type_id`) REFERENCES `service_types` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `schedules`
+--
+
+LOCK TABLES `schedules` WRITE;
+/*!40000 ALTER TABLE `schedules` DISABLE KEYS */;
+INSERT INTO `schedules` VALUES (1,'rabu','10:00:00','12:00:00',100,1,'open','2026-02-26 21:56:19','2026-02-26 21:56:19'),(3,'rabu','10:00:00','12:00:00',100,2,'open','2026-02-26 21:58:49','2026-02-26 21:58:49');
+/*!40000 ALTER TABLE `schedules` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `service_types`
+--
+
+DROP TABLE IF EXISTS `service_types`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `service_types` (
+  `id` int unsigned NOT NULL AUTO_INCREMENT,
+  `nama_layanan` varchar(150) COLLATE utf8mb4_general_ci NOT NULL,
+  `deskripsi` text COLLATE utf8mb4_general_ci,
+  `durasi_estimasi_menit` int NOT NULL COMMENT 'Estimasi durasi dalam menit',
+  `aktif` tinyint(1) NOT NULL DEFAULT '1',
+  `created_at` datetime DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `service_types`
+--
+
+LOCK TABLES `service_types` WRITE;
+/*!40000 ALTER TABLE `service_types` DISABLE KEYS */;
+INSERT INTO `service_types` VALUES (1,'Akupressure','Layanan Akupressure',15,1,'2026-02-26 21:55:39','2026-06-27 10:59:37'),(2,'Akupuntur','Layanan Akupuntur',20,1,'2026-02-26 21:55:55','2026-06-19 02:38:24'),(4,'Tusuk Jarum','',5,0,'2026-06-25 20:06:31','2026-06-27 10:59:52'),(5,'Pijat Cepat','-',10,1,'2026-06-25 20:06:43','2026-06-25 20:06:43');
+/*!40000 ALTER TABLE `service_types` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `users`
+--
+
+DROP TABLE IF EXISTS `users`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `users` (
+  `id` int unsigned NOT NULL AUTO_INCREMENT,
+  `name` varchar(150) COLLATE utf8mb4_general_ci NOT NULL,
+  `email` varchar(150) COLLATE utf8mb4_general_ci NOT NULL,
+  `phone` varchar(20) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `alamat` text COLLATE utf8mb4_general_ci,
+  `password` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
+  `role` enum('admin','user') COLLATE utf8mb4_general_ci NOT NULL DEFAULT 'user',
+  `status` enum('active','suspended') COLLATE utf8mb4_general_ci NOT NULL DEFAULT 'suspended',
+  `created_at` datetime DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  `deleted_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `email` (`email`)
+) ENGINE=InnoDB AUTO_INCREMENT=22 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `users`
+--
+
+LOCK TABLES `users` WRITE;
+/*!40000 ALTER TABLE `users` DISABLE KEYS */;
+INSERT INTO `users` VALUES (2,'Dwi Rahayu','ortu@email.com','081234567891',NULL,'$2y$12$cSS5Tct7qyrZ5L7n7P7wdOAZ7E9jiRG.C5P3.HWeRZ9IdTWbzAcku','admin','active','2026-02-16 12:45:30','2026-06-19 05:48:53',NULL),(3,'Budi Santoso','anak@email.com','081234567890',NULL,'$2y$12$bgTnPKATWlA.j5/99LfQIeSnxF6VenLg91Z2VvKowtwsEqVVmhOvm','user','active','2026-02-18 21:56:37','2026-07-11 03:02:13',NULL),(4,'Abdul Gani','anak2@email.com','08123456',NULL,'$2y$12$.2xTyMAk9fbA/rJj2pPWDuHE2fgMYUcF34ZJlmWHUM3SSE9.NM7q2','admin','suspended','2026-02-18 22:08:45','2026-02-25 20:29:30','2026-02-25 20:29:30'),(5,'Abdul Ghafur','ortu@gmil.com','08123456789',NULL,'$2y$12$15WADg/8VCKPfu.rruHk6OvNCKPlBagNHNQAuxRG4Gv4oGnrera8W','user','active','2026-03-12 07:15:10','2026-06-23 17:55:20',NULL),(6,'Diana S','ortu@gmial.com','08123456789',NULL,'$2y$12$96MKFDAxHesoke8vDV5yPuiXZo09QR15ZXUvaAZbuhkgkizUg7ddG','user','active','2026-03-12 07:29:57','2026-06-23 18:29:03',NULL),(7,'Malik al alam','ortu@gmails.com','08123456789',NULL,'$2y$12$iDEvIWVMSM/z4TtEQQNDfulltokMTMscPMnfofNMFbJgAUXF.Dmqe','admin','suspended','2026-03-13 01:21:05','2026-03-13 01:21:05',NULL),(8,'Joko Suyatno','john@doen.com','+628123456789',NULL,'$2y$12$AVKSXKVWiHRKrZs3M6byuu.f6v248xQdByeproXs5ysD92YW7zosC','admin','suspended','2026-03-13 01:27:24','2026-03-13 01:27:24',NULL),(9,'Fajar K','john@doen.comi','+628123456789',NULL,'$2y$12$ihE.dt59RYja8BYKZ99/3uefieS5s4I8.clH6qOe6ENIgoeeAtRaa','admin','suspended','2026-03-13 01:28:29','2026-03-13 01:28:29',NULL),(10,'Ahmad Fauzan','ortu@gmails2.com','08123456789','Jl. Soekarno Hatta','$2y$12$yFJeN3wV4TN217x3.XH6Net9x4Fh0TJoSmeLpuTzWXKXUUQ0zYLPi','admin','suspended','2026-05-09 14:15:09','2026-05-09 14:15:09',NULL),(11,'Bagus S','ortu@gmails3.com','08123456789','Jl. Ir Juanda','$2y$12$5E.xQB3trSGCYNsmENLo3uxkU4HMtZuBWPvPNGlxoQn5Sr7ijGPVC','user','suspended','2026-05-10 03:02:02','2026-06-23 11:28:52',NULL),(12,'Totok S','ortu@gmails4.com','08123456789','Jl. Ir Juanda','$2y$12$Xa7oV4qDrZFylIE4DBojVuFSGn0SXxZI3zPuM5UoGG31ltuUUni9q','admin','active','2026-05-10 03:03:13','2026-06-19 02:55:57',NULL),(13,'Hendro D','ortu@gmails5.com','08123456789','Jl. Ir Juanda','$2y$12$wh3lZJfjP0Ah47jp3Z4Z9uESYn3pVsNu96SdI.jFtrRtHSwEAZjv6','admin','suspended','2026-05-10 03:03:16','2026-05-10 03:03:16',NULL),(14,'Alfian S','ortu@gmails6.com','08123456789','Jl. Ir Juanda','$2y$12$ZvprlB75gwy93yj.oCrU6ODzsUNy2MzbGF8NaYspPtq3k2JSM0KLC','admin','suspended','2026-05-10 03:03:30','2026-05-10 03:03:30',NULL),(15,'Deny S','admin@gmail.com','081221375558',NULL,'$2y$12$J/kyKt6UfyqSWcPs5WELpuGOJPuYXG7IbwU74c1.dyoIgQdOP//oW','user','suspended','2026-05-18 12:53:01','2026-05-18 12:53:01',NULL),(16,'Muhammad Saka','admin@gmail.comi','081221375558',NULL,'$2y$12$M1ukE.2Jc690vlm2lfbj2uDobGsGEqQ5/Ta2j4b97Dn/v0w.p6iOK','user','suspended','2026-05-18 12:54:34','2026-05-18 12:54:34',NULL),(17,'Firanda A','admin@gmail.coma','081221375558',NULL,'$2y$12$7rOCZaw25H8CYG40r618P.jyq2nUN9dihv22N5C9sTGQQKkfip0Y.','user','suspended','2026-05-18 12:55:07','2026-05-18 12:55:07',NULL),(18,'Khalid B','admin@gmail.como','081221375558',NULL,'$2y$12$/TSPHKrAhLpsyiRPmdheFunfTT0eKD/OFAQJTUGQut2C4tReJL/OW','user','suspended','2026-05-18 12:55:28','2026-05-18 12:55:28',NULL),(19,'Syafiq B','admin@gmail.comu','081221375558',NULL,'$2y$12$IjWI3S7e0hPCzHPYPJQbM.3XwtajfDzCzlha4dFWLMy.WaPH.Szai','user','suspended','2026-05-18 12:56:28','2026-05-18 12:56:28',NULL),(20,'Indro Warkop','ortu@gmails9.com','08123456789','Jl. Ir Juanda','$2y$12$ykIhOo.WtEkNbXWkdVaiCOU5x/WHawqmHt89St9jHARIpgVQrJHC2','user','suspended','2026-05-18 12:57:14','2026-05-18 12:57:14',NULL),(21,'Dimas','dimas@adipati.id','+628123456789',NULL,'$2y$12$4KPoVEVpOQmdl4yigC2hyOenOcIaNbSY1DGkU6Lnnu/gP8MCJD7lK','user','suspended','2026-06-23 22:39:04','2026-06-23 22:39:04',NULL);
+/*!40000 ALTER TABLE `users` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Temporary view structure for view `v_patients`
+--
+
+DROP TABLE IF EXISTS `v_patients`;
+/*!50001 DROP VIEW IF EXISTS `v_patients`*/;
+SET @saved_cs_client     = @@character_set_client;
+/*!50503 SET character_set_client = utf8mb4 */;
+/*!50001 CREATE VIEW `v_patients` AS SELECT 
+ 1 AS `id`,
+ 1 AS `no_kk`,
+ 1 AS `nama`,
+ 1 AS `alamat`,
+ 1 AS `tanggal_lahir`,
+ 1 AS `jenis_kelamin`,
+ 1 AS `usia`,
+ 1 AS `parent_name`,
+ 1 AS `email`,
+ 1 AS `parent_id`*/;
+SET character_set_client = @saved_cs_client;
+
+--
+-- Temporary view structure for view `v_queues`
+--
+
+DROP TABLE IF EXISTS `v_queues`;
+/*!50001 DROP VIEW IF EXISTS `v_queues`*/;
+SET @saved_cs_client     = @@character_set_client;
+/*!50503 SET character_set_client = utf8mb4 */;
+/*!50001 CREATE VIEW `v_queues` AS SELECT 
+ 1 AS `queue_id`,
+ 1 AS `tanggal_kunjungan`,
+ 1 AS `nomor_antrian`,
+ 1 AS `status`,
+ 1 AS `nama_pasien`,
+ 1 AS `usia`,
+ 1 AS `nama_parent`,
+ 1 AS `layanan`*/;
+SET character_set_client = @saved_cs_client;
+
+--
+-- Dumping routines for database 'db'
+--
+
+--
+-- Final view structure for view `v_patients`
+--
+
+/*!50001 DROP VIEW IF EXISTS `v_patients`*/;
+/*!50001 SET @saved_cs_client          = @@character_set_client */;
+/*!50001 SET @saved_cs_results         = @@character_set_results */;
+/*!50001 SET @saved_col_connection     = @@collation_connection */;
+/*!50001 SET character_set_client      = utf8mb4 */;
+/*!50001 SET character_set_results     = utf8mb4 */;
+/*!50001 SET collation_connection      = utf8mb4_0900_ai_ci */;
+/*!50001 CREATE ALGORITHM=UNDEFINED */
+/*!50013 DEFINER=`root`@`%` SQL SECURITY DEFINER */
+/*!50001 VIEW `v_patients` AS select `p`.`id` AS `id`,`p`.`no_kk` AS `no_kk`,`p`.`nama` AS `nama`,`p`.`alamat` AS `alamat`,date_format(`p`.`tanggal_lahir`,'%d %M %Y') AS `tanggal_lahir`,if((`p`.`jenis_kelamin` = 'L'),'Laki-laki','Perempuan') AS `jenis_kelamin`,concat(timestampdiff(YEAR,`p`.`tanggal_lahir`,curdate()),' tahun ',(timestampdiff(MONTH,`p`.`tanggal_lahir`,curdate()) % 12),' bulan') AS `usia`,`u`.`name` AS `parent_name`,`u`.`email` AS `email`,`u`.`id` AS `parent_id` from (`patients` `p` left join `users` `u` on((`p`.`parent_id` = `u`.`id`))) */;
+/*!50001 SET character_set_client      = @saved_cs_client */;
+/*!50001 SET character_set_results     = @saved_cs_results */;
+/*!50001 SET collation_connection      = @saved_col_connection */;
+
+--
+-- Final view structure for view `v_queues`
+--
+
+/*!50001 DROP VIEW IF EXISTS `v_queues`*/;
+/*!50001 SET @saved_cs_client          = @@character_set_client */;
+/*!50001 SET @saved_cs_results         = @@character_set_results */;
+/*!50001 SET @saved_col_connection     = @@collation_connection */;
+/*!50001 SET character_set_client      = utf8mb4 */;
+/*!50001 SET character_set_results     = utf8mb4 */;
+/*!50001 SET collation_connection      = utf8mb4_0900_ai_ci */;
+/*!50001 CREATE ALGORITHM=UNDEFINED */
+/*!50013 DEFINER=`root`@`%` SQL SECURITY DEFINER */
+/*!50001 VIEW `v_queues` AS select `q`.`id` AS `queue_id`,date_format(`q`.`tanggal_kunjungan`,'%d %M %Y') AS `tanggal_kunjungan`,`q`.`nomor_antrian` AS `nomor_antrian`,`q`.`status` AS `status`,`p`.`nama` AS `nama_pasien`,concat(timestampdiff(YEAR,`p`.`tanggal_lahir`,curdate()),' tahun ',(timestampdiff(MONTH,`p`.`tanggal_lahir`,curdate()) % 12),' bulan') AS `usia`,`u`.`name` AS `nama_parent`,group_concat(`st`.`nama_layanan` order by `st`.`nama_layanan` ASC separator ', ') AS `layanan` from ((((`queue` `q` left join `patients` `p` on((`q`.`patient_id` = `p`.`id`))) left join `users` `u` on((`p`.`parent_id` = `u`.`id`))) left join `queue_service_types` `qst` on((`q`.`id` = `qst`.`queue_id`))) left join `service_types` `st` on((`qst`.`service_type_id` = `st`.`id`))) group by `q`.`id`,`q`.`tanggal_kunjungan`,`q`.`nomor_antrian`,`q`.`status`,`p`.`nama`,`u`.`name` order by `q`.`tanggal_kunjungan`,`q`.`nomor_antrian` */;
+/*!50001 SET character_set_client      = @saved_cs_client */;
+/*!50001 SET character_set_results     = @saved_cs_results */;
+/*!50001 SET collation_connection      = @saved_col_connection */;
+/*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
+
+/*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
+/*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
+/*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+/*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
+
+-- Dump completed on 2026-07-31  2:07:07

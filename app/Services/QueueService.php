@@ -35,6 +35,7 @@ class QueueService
         return $this->enrichQueuesWithServices($queues);
     }
 
+   // why we need it??? 😁 
     public function find($id)
     {
         $queue = $this->queueModel->getQueueDetailWithPatient((int) $id);
@@ -117,7 +118,8 @@ class QueueService
             ];
         }
 
-        return $this->find((int) $id);
+        return $this->find((int) $id); //need investigation here
+        //seems that $this->find() is used to return updated values so users can see what they are updating
     }
 
     public function delete($id)

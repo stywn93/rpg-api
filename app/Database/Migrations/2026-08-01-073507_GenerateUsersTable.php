@@ -11,7 +11,7 @@ class CreateUsersTable extends Migration
         $this->forge->addField([
             'id' => [
                 'type'           => 'INT',
-                'constraint'     => 11,
+                'constraint'     => 10,
                 'unsigned'       => true,
                 'auto_increment' => true,
             ],
@@ -22,12 +22,15 @@ class CreateUsersTable extends Migration
             'email' => [
                 'type'       => 'VARCHAR',
                 'constraint' => 150,
-                'unique'     => true,
             ],
             'phone' => [
                 'type'       => 'VARCHAR',
                 'constraint' => 20,
                 'null'       => true,
+            ],
+            'address' => [
+                'type' => 'TEXT',
+                'null' => true,
             ],
             'password' => [
                 'type'       => 'VARCHAR',
@@ -41,7 +44,7 @@ class CreateUsersTable extends Migration
             'status' => [
                 'type'       => 'ENUM',
                 'constraint' => ['active', 'suspended'],
-                'default'    => 'active',
+                'default'    => 'suspended',
             ],
             'created_at' => [
                 'type' => 'DATETIME',
@@ -51,14 +54,24 @@ class CreateUsersTable extends Migration
                 'type' => 'DATETIME',
                 'null' => true,
             ],
+            'deleted_at' => [
+                'type' => 'DATETIME',
+                'null' => true,
+            ],
         ]);
 
-        $this->forge->addKey('id', true);
-        $this->forge->createTable('users');
+        $this->forge->addKey('id', true); // primary key
+        $this->forge->addUniqueKey('email');
+
+        $this->forge->createTable('users', true, [
+            'ENGINE'  => 'InnoDB',
+            'CHARSET' => 'utf8mb4',
+            'COLLATE' => 'utf8mb4_general_ci',
+        ]);
     }
 
     public function down()
     {
-        $this->forge->dropTable('users');
+        $this->forge->dropTable('users', true);
     }
 }

@@ -25,7 +25,7 @@ class QueueModel extends Model
     protected $validationRules = [
         'tanggal_kunjungan' => 'required|valid_date[Y-m-d]',
         'patient_id'        => 'permit_empty|integer|is_not_unique[patients.id]',
-        'service_type_ids'  => 'required|regex_match[/^\d+(,\d+)*$/]',
+        // 'service_type_ids'  => 'required|regex_match[/^\d+(,\d+)*$/]',
         'nomor_antrian'     => 'permit_empty|integer|greater_than[0]',
         'status'            => 'required|in_list[booked,checked_in,called,served,finished,no_show,cancelled]',
     ];
@@ -124,7 +124,6 @@ class QueueModel extends Model
         return $this->select(
             "queue.id,
             queue.patient_id,
-            queue.service_type_ids,
             queue.nomor_antrian AS nomor,
             queue.nomor_antrian,
             queue.tanggal_kunjungan,
