@@ -12,7 +12,13 @@ $routes->group('api/v1', ['namespace' => 'App\Controllers\Api\V1', 'filter' => '
 
 });
 $routes->group('api/v1', ['namespace' => 'App\Controllers\Api\V1', 'filter' => 'jwt'], function ($routes) {
-    $routes->resource('users', ['controller' => 'UserController']);
+    // $routes->resource('users', [
+    //     'controller' => 'UserController'
+    //     ]);
+    $routes->get('users', 'UserController::index');
+    $routes->get('users/(:num)', 'UserController::show/$1');
+    $routes->post('users', 'UserController::create');
+    $routes->delete('users/(:num)', 'UserController::delete/$1');
     $routes->patch('users/(:num)/password', 'UserController::updatePassword/$1');
     $routes->post('users/(:num)/activate/', 'UserController::activate/$1');
     $routes->post('users/(:num)/suspend', 'UserController::suspend/$1');
@@ -21,13 +27,13 @@ $routes->group('api/v1', ['namespace' => 'App\Controllers\Api\V1', 'filter' => '
     $routes->get('patients/(:num)', 'PatientController::show/$1');
     $routes->get('patients/parent/(:num)', 'PatientController::showByParent/$1');
 
-    $routes->resource('schedules', ['controller' => 'ScheduleController']);
-    $routes->resource('servicetypes', ['controller' => 'ServiceTypeController']);
-    $routes->get('queues/date/(:segment)', 'QueueController::filterByDate/$1');
+    // $routes->resource('schedules', ['controller' => 'ScheduleController']);
+    // $routes->resource('servicetypes', ['controller' => 'ServiceTypeController']);
+    // $routes->get('queues/date/(:segment)', 'QueueController::filterByDate/$1');
     /* $routes->resource('queues', ['controller' => 'QueueController']); */
-    $routes->resource('queuelogs', ['controller' => 'QueueLogController']);
-    $routes->get('growthrecords/patient/(:num)', 'GrowthRecordController::showByPatient/$1');
-    $routes->resource('growthrecords', ['controller' => 'GrowthRecordController']);
+    // $routes->resource('queuelogs', ['controller' => 'QueueLogController']);
+    // $routes->get('growthrecords/patient/(:num)', 'GrowthRecordController::showByPatient/$1');
+    // $routes->resource('growthrecords', ['controller' => 'GrowthRecordController']);
 
     // new route for v_patients view
     $routes->get('patients/with-parents', 'PatientController::listWithParents');

@@ -4,31 +4,53 @@ namespace App\Controllers\Api\V1;
 
 use App\Services\UserService;
 use CodeIgniter\RESTful\ResourceController;
+use App\Models\UserModel;
 
 class UserController extends ResourceController
 {
     protected $format = 'json';
     protected $userService;
+    protected $userModel;
 
     public function __construct(){
         $this->userService = new UserService();
+        $this->userModel = new UserModel();
     }
 
-    public function index()
-    {
-        $perPage = max(1, (int) ($this->request->getGet('per_page') ?? 10));
-        $page = max(1, (int) ($this->request->getGet('page') ?? 1));
-        $searchTerm = trim((string) ($this->request->getGet('searchTerm') ?? ''));
-        $status = trim((string) ($this->request->getGet('status') ?? ''));
-        $role = trim((string) ($this->request->getGet('role') ?? ''));
-        $result = $this->userService->list($perPage, $page, $searchTerm, $status, $role);
+    // public function index()
+    // {
+    //     $perPage = max(1, (int) ($this->request->getGet('per_page') ?? 10));
+    //     $page = max(1, (int) ($this->request->getGet('page') ?? 1));
+    //     $searchTerm = trim((string) ($this->request->getGet('searchTerm') ?? ''));
+    //     $status = trim((string) ($this->request->getGet('status') ?? ''));
+    //     $role = trim((string) ($this->request->getGet('role') ?? ''));
+    //     $result = $this->userService->list($perPage, $page, $searchTerm, $status, $role);
 
-        return $this->respond([
+    //     return $this->respond([
+    //         'status' => 'success',
+    //         'message' => 'Users data fetched',
+    //         'data' => $result['data'],
+    //         'meta' => $result['meta'],
+    //         'errors' => null
+    //     ]);
+    // }
+
+    function index(){
+        $page = $this->request->getGet('page') ?? 1;
+        $perPage = $this->request->getGet('per_page') ?? 10;
+        $users = $this->userModel->paginate($perPage, 'default', $page);
+        $pager = $this->userModel->pager;
+
+        return $this->response->setJSON([
             'status' => 'success',
             'message' => 'Users data fetched',
-            'data' => $result['data'],
-            'meta' => $result['meta'],
-            'errors' => null
+            'data' => $users,
+            'meta'    => [
+                'total'        => $pager->getTotal(),
+                'per_page'     => $pager->getPerPage(),
+                'current_page' => $pager->getCurrentPage(),
+                'last_page'    => $pager->getPageCount(),
+            ],
         ]);
     }
 
