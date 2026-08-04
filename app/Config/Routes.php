@@ -18,10 +18,12 @@ $routes->group('api/v1', ['namespace' => 'App\Controllers\Api\V1', 'filter' => '
     $routes->get('users', 'UserController::index');
     $routes->get('users/(:num)', 'UserController::show/$1');
     $routes->post('users', 'UserController::create');
+    $routes->patch('users/(:num)', 'UserController::update/$1');
     $routes->delete('users/(:num)', 'UserController::delete/$1');
-    $routes->patch('users/(:num)/password', 'UserController::updatePassword/$1');
-    $routes->post('users/(:num)/activate/', 'UserController::activate/$1');
-    $routes->post('users/(:num)/suspend', 'UserController::suspend/$1');
+    // $routes->patch('users/(:num)/password', 'UserController::updatePassword/$1');
+    // $routes->post('users/(:num)/activate/', 'UserController::activate/$1');
+    // $routes->post('users/(:num)/suspend', 'UserController::suspend/$1');
+
 
     $routes->resource('patients', ['controller' => 'PatientController', 'except' => ['show', 'edit']]);
     $routes->get('patients/(:num)', 'PatientController::show/$1');

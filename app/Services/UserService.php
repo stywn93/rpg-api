@@ -48,10 +48,10 @@ class UserService
     public function update($id, $data)
     {
         $data = $this->normalizeRolePayload($data);
-        if (isset($data['password'])) {
-            $data['password'] = password_hash($data['password'], PASSWORD_DEFAULT);
+        if (isset($data['password'])) { //check if there is password change
+            $data['password'] = password_hash($data['password'], PASSWORD_DEFAULT); //if true then hash the password
         }
-        $user = $this->userModel->find($id);
+        $user = $this->userModel->find($id); //check if user exists
 
         if(!$user){
             return [
@@ -62,12 +62,12 @@ class UserService
         if(isset($data['email'])){
             if($this->userModel->where('email', $data['email'])->where('id !=', $id)->first()){
                 return [
-                    'error' => 'email already exists',
+                    'error' => 'email already exists', //email is already used by another user
                     'code' => 409
                 ];
             }
         }
-        if(isset($data['status'])){
+        if(isset($data['status'])){ //i don't remember why i put this code here
             return [
                 'error' => 'wrong API to activate or suspend',
                 'code' => 400
