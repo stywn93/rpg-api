@@ -4,40 +4,68 @@ namespace App\Controllers\Api\V1;
 
 use App\Services\UserService;
 use CodeIgniter\RESTful\ResourceController;
+use App\Models\UserModel;
 
 class UserController extends ResourceController
 {
     protected $format = 'json';
     protected $userService;
+    protected $userModel;
 
     public function __construct(){
         $this->userService = new UserService();
+        $this->userModel = new UserModel();
     }
 
-    public function index()
-    {
-        $perPage = max(1, (int) ($this->request->getGet('per_page') ?? 10));
-        $page = max(1, (int) ($this->request->getGet('page') ?? 1));
-        $searchTerm = trim((string) ($this->request->getGet('searchTerm') ?? ''));
-        $status = trim((string) ($this->request->getGet('status') ?? ''));
-        $role = trim((string) ($this->request->getGet('role') ?? ''));
-        $result = $this->userService->list($perPage, $page, $searchTerm, $status, $role);
+    function index(){
+        $page   = $this->request->getGet('page') ?? 1;
+        $perPage = $this->request->getGet('per_page') ?? 3;
+        
+        //search parameter
+        $status = trim((string) $this->request->getGet('status') ?? '');
+        $role   = trim((string) ($this->request->getGet('role') ?? ''));
+        $email  = trim((string) $this->request->getGet('email') ?? '');
+        $address = trim((string) $this->request->getGet('address') ?? '');
+        $name   = trim((string) $this->request->getGet('name') ?? '');
 
-        return $this->respond([
+        if ($name !== '') {
+        $this->userModel->groupStart()
+              ->like('name', $name)
+              ->groupEnd();
+        }
+        // Filter role (exact match, AND dengan yang lain)
+        if ($role !== '') {
+            $this->userModel->where('role', $role);
+        }
+        if ($status !== '') {
+            $this->userModel->where('status', $status);
+        }
+        if($address !== ''){
+            $this->userModel->like('address', $address);
+        }
+
+        $users  = $this->userModel->paginate($perPage, 'default', $page);
+        $pager  = $this->userModel->pager;
+
+        return $this->response->setJSON([
             'status' => 'success',
             'message' => 'Users data fetched',
-            'data' => $result['data'],
-            'meta' => $result['meta'],
-            'errors' => null
+            'data' => $users,
+            'meta'    => [
+                'total'        => $pager->getTotal(),
+                'per_page'     => $pager->getPerPage(),
+                'current_page' => $pager->getCurrentPage(),
+                'last_page'    => $pager->getPageCount(),
+            ],
         ]);
     }
 
     public function show($id = null){
-        $user = $this->userService->find($id);
+        $user = $this->userModel->find($id);
         if(!$user){
             return $this->failNotFound("User not found");
         }
-        return $this->respond([
+        return $this->response->setJSON([
             'status' => 'success',
             'message' => 'User data fetched',
             'data' => $user,
@@ -45,42 +73,93 @@ class UserController extends ResourceController
         ]);
     }
 
+
     public function create(){
         $data = $this->request->getJSON(true);
-        $insert = $this->userService->create($data);
-        if (isset($insert['error'])) {
-            return $this->failValidationErrors($insert['error']);
+        
+        // $data = $this->normalizeRolePayload($data);
+        $data['password'] = password_hash($data['password'], PASSWORD_DEFAULT);
+        if ($this->userModel->withDeleted()->where('email', $data['email'])->first()) {
+            return $this->response->setJSON([
+                'status' => 'failed',
+                'message' => 'Email already used',
+                'data' => $data['email'],
+                'errors' => '409'
+            ]);
         }
-        return $this->respondCreated([
-            'status' => 'successfull',
-            'message' => 'User created successfully',
-            'data' => $insert,
-            'errors' => null
+        $inserted = $this->userModel->insert($data);
+        if ($inserted === false) {
+            return $this->response->setJSON([
+                'status' => 'failed',
+                'message' => 'Error creating user',
+                'data' => $data,
+                'errors' => $this->userModel->errors()
+            ]);
+        }
+        
+        //if success then return this
+        return $this->response->setJSON([
+            'status' => 'success',
+            'message' => 'User created',
+            'data' => $this->userModel->find($this->userModel->getInsertID()),
+            'errors' => '-'
         ]);
+        // return $this->presentUser($this->userModel->find($this->userModel->getInsertID()));
     }
 
     public function update($id = null){
         $data = $this->request->getJSON(true);
-        $user = $this->userService->update($id, $data);
 
-        if (isset($user['error'])) {
-            if (($user['code'] ?? 500) === 404) {
-                return $this->failNotFound($user['error']);
-            }
+        if (isset($data['password'])) { //check if there is password change
+            $data['password'] = password_hash($data['password'], PASSWORD_DEFAULT); //if true then hash the password
+        }
+        $user = $this->userModel->find($id); //check if user exists
 
-            if (($user['code'] ?? 500) === 409) {
-                return $this->failValidationErrors($user['error']);
-            }
-
-            if (($user['code'] ?? 500) === 400) {
-                return $this->failValidationErrors($user['error']);
+        if(!$user){
+            return $this->response->setJSON([
+                'status' => 'failed',
+                'message' => 'User not found',
+                'data' => $id,
+                'errors' => '404'
+            ]);
+        }
+        if(isset($data['email'])){
+            if($this->userModel->where('email', $data['email'])->where('id !=', $id)->first()){
+                return $this->response->setJSON([
+                    'status' => 'failed',
+                    'message' => 'Email already exists',
+                    'data' => $data['email'],
+                    'errors' => '409'
+                ]);
             }
         }
-        return $this->respondUpdated([
+        $this->userModel->update($id, $data);
+        return $this->response->setJSON([
             'status' => 'success',
-            'message' => 'User updated successfully',
-            'data' => $user,
-            'errors' => null
+            'message' => 'User updated',
+            'data' => $this->userModel->find($id),
+            'errors' => '-'
+        ]);
+
+    }
+
+    public function delete($id = null){
+        $user = $this->userModel->find($id);
+
+        if(!$user){
+            return $this->response->setJSON([
+                'status' => 'failed',
+                'message' => 'User not found',
+                'data' => $id,
+                'errors' => '404'
+            ]);
+        }
+        $this->userModel->delete($id);
+        return $this->respondDeleted([
+            'status' => 'success',
+            'message' => 'User deleted successfully',
+            'data' => $id,
+            'errors' => '-'
         ]);
 
     }
@@ -111,20 +190,7 @@ class UserController extends ResourceController
         ]);
     }
 
-    public function delete($id = null){
-        $user = $this->userService->delete($id);
-        if (isset($user['error'])) {
-            if (($user['code'] ?? 500) === 404) {
-                return $this->failNotFound($user['error']);
-            }
-        }
-        return $this->respondDeleted([
-            'status' => 'success',
-            'message' => 'User deleted successfully',
-            'data' => $id,
-            'errors' => null
-        ]);
-    }
+    
 
 
     public function activate($id){ 

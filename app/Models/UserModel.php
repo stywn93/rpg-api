@@ -42,50 +42,50 @@ class UserModel extends Model
     protected $validationMessages = [];
     protected $skipValidation = false;
 
-    public function searchPaginated(int $perPage = 10, ?int $page = null, ?string $searchTerm = null, ?string $status = null, ?string $role = null): array
-    {
-        $searchTerm = is_string($searchTerm) ? trim($searchTerm) : '';
-        $status = is_string($status) ? trim($status) : '';
-        $role = is_string($role) ? trim($role) : '';
+    // public function searchPaginated(int $perPage = 10, ?int $page = null, ?string $searchTerm = null, ?string $status = null, ?string $role = null): array
+    // {
+    //     $searchTerm = is_string($searchTerm) ? trim($searchTerm) : '';
+    //     $status = is_string($status) ? trim($status) : '';
+    //     $role = is_string($role) ? trim($role) : '';
 
-        if ($status !== '') {
-            $this->where('status', $status);
-        }
+    //     if ($status !== '') {
+    //         $this->where('status', $status);
+    //     }
 
-        if ($role !== '') {
-            $this->where('role', $role);
-        }
+    //     if ($role !== '') {
+    //         $this->where('role', $role);
+    //     }
 
-        if ($searchTerm !== '') {
-            $this->groupStart()
-                ->like('name', $searchTerm)
-                ->orLike('email', $searchTerm)
-                ->orLike('phone', $searchTerm)
-                ->orLike('alamat', $searchTerm)
-                ->orLike('role', $searchTerm)
-                ->orLike('status', $searchTerm)
-                ->groupEnd();
-        }
+    //     if ($searchTerm !== '') {
+    //         $this->groupStart()
+    //             ->like('name', $searchTerm)
+    //             ->orLike('email', $searchTerm)
+    //             ->orLike('phone', $searchTerm)
+    //             ->orLike('alamat', $searchTerm)
+    //             ->orLike('role', $searchTerm)
+    //             ->orLike('status', $searchTerm)
+    //             ->groupEnd();
+    //     }
 
-        return $this->paginate($perPage, 'default', $page);
-    }
+    //     return $this->paginate($perPage, 'default', $page);
+    // }
 
-    public function getPaginationMeta(string $group = 'default'): array
-    {
-        if ($this->pager === null) {
-            return [
-                'current_page' => 1,
-                'per_page' => 0,
-                'total' => 0,
-                'last_page' => 1,
-            ];
-        }
+    // public function getPaginationMeta(string $group = 'default'): array
+    // {
+    //     if ($this->pager === null) {
+    //         return [
+    //             'current_page' => 1,
+    //             'per_page' => 0,
+    //             'total' => 0,
+    //             'last_page' => 1,
+    //         ];
+    //     }
 
-        return [
-            'current_page' => $this->pager->getCurrentPage($group),
-            'per_page' => $this->pager->getPerPage($group),
-            'total' => $this->pager->getTotal($group),
-            'last_page' => $this->pager->getPageCount($group),
-        ];
-    }
+    //     return [
+    //         'current_page' => $this->pager->getCurrentPage($group),
+    //         'per_page' => $this->pager->getPerPage($group),
+    //         'total' => $this->pager->getTotal($group),
+    //         'last_page' => $this->pager->getPageCount($group),
+    //     ];
+    // }
 }

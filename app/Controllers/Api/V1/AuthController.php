@@ -1,10 +1,8 @@
 <?php
-
 namespace App\Controllers\Api\V1;
 
 use CodeIgniter\RESTful\ResourceController;
 use App\Services\AuthService;
-
 
 class AuthController extends ResourceController
 {
