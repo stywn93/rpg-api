@@ -2,135 +2,186 @@
 
 namespace App\Controllers\Api\V1;
 
-use App\Services\PatientService;
+use App\Models\PatientModel;
 use CodeIgniter\RESTful\ResourceController;
 
 class PatientController extends ResourceController
 {
     protected $format = 'json';
-    protected $patientService;
+    protected $patientModel;
 
     public function __construct()
     {
-        $this->patientService = new PatientService();
+        $this->patientModel = new PatientModel();
     }
 
     public function index()
     {
-        $perPage = $this->request->getGet('per_page') ?? 10;
-        return $this->respond([
+        $page    = (int) ($this->request->getGet('page') ?? 1);
+        $perPage = (int) ($this->request->getGet('per_page') ?? 10);
+
+        $name       = trim((string) $this->request->getGet('name') ?? '');
+        $genderCode = trim((string) $this->request->getGet('gender_code') ?? '');
+        $userId     = trim((string) $this->request->getGet('user_id') ?? '');
+
+        if ($name !== '') {
+            $this->patientModel->like('name', $name);
+        }
+        if ($genderCode !== '') {
+            $this->patientModel->where('gender_code', $genderCode);
+        }
+        if ($userId !== '') {
+            $this->patientModel->where('user_id', $userId);
+        }
+
+        $patients = $this->patientModel->getPaginatedWithAge($perPage, $page);
+        $pager    = $this->patientModel->pager;
+
+        return $this->response->setJSON([
             'status' => 'success',
-            'message' => 'patients data fetched',
-            'data' => $this->patientService->list($perPage),
-            'errors' => null
+            'message' => 'Patients data fetched',
+            'data' => $patients,
+            'meta' => [
+                'total'        => $pager->getTotal(),
+                'per_page'     => $pager->getPerPage(),
+                'current_page' => $pager->getCurrentPage(),
+                'last_page'    => $pager->getPageCount(),
+            ],
         ]);
     }
 
     public function show($id = null)
     {
-        $patient = $this->patientService->find($id);
+        $patient = $this->patientModel->findWithAge($id);
+
         if (!$patient) {
-            return $this->failNotFound("patient not founds");
+            return $this->response->setJSON([
+                'status' => 'failed',
+                'message' => 'Patient not found',
+                'data' => $id,
+                'errors' => '404',
+            ]);
         }
-        return $this->respond([
+
+        return $this->response->setJSON([
             'status' => 'success',
-            'message' => 'patient data fetched',
+            'message' => 'Patient data fetched',
             'data' => $patient,
-            'errors' => null
+            'errors' => null,
         ]);
     }
 
     public function create()
     {
-        $data = $this->getRequestData();
-        $insert = $this->patientService->create($data);
-        if (isset($insert['error'])) {
-            return $this->failValidationErrors($insert['error']);
+        $data = $this->request->getJSON(true);
+
+        $inserted = $this->patientModel->insert($data);
+        if ($inserted === false) {
+            return $this->response->setJSON([
+                'status' => 'failed',
+                'message' => 'Error creating patient',
+                'data' => $data,
+                'errors' => $this->patientModel->errors(),
+            ]);
         }
-        return $this->respondCreated([
+
+        return $this->response->setJSON([
             'status' => 'success',
-            'message' => 'patient created successfully',
-            'data' => $insert,
-            'errors' => null
+            'message' => 'Patient created',
+            'data' => $this->patientModel->findWithAge($this->patientModel->getInsertID()),
+            'errors' => '-',
         ]);
     }
 
     public function update($id = null)
     {
-        $data = $this->getRequestData();
-        $patient = $this->patientService->update($id, $data);
+        $data = $this->request->getJSON(true);
 
-        if (isset($patient['error'])) {
-            if (($patient['code'] ?? 500) === 404) {
-                return $this->failNotFound($patient['error']);
-            }
+        $patient = $this->patientModel->find($id);
 
-            if (($patient['code'] ?? 500) === 400) {
-                return $this->failValidationErrors($patient['error']);
+        if (!$patient) {
+            return $this->response->setJSON([
+                'status' => 'failed',
+                'message' => 'Patient not found',
+                'data' => $id,
+                'errors' => '404',
+            ]);
+        }
+
+        if (isset($data['no_kk'])) {
+            if ($this->patientModel->withDeleted()->where('no_kk', $data['no_kk'])->where('id !=', $id)->first()) {
+                return $this->response->setJSON([
+                    'status' => 'failed',
+                    'message' => 'No KK already exists',
+                    'data' => $data['no_kk'],
+                    'errors' => '409',
+                ]);
             }
         }
-        return $this->respondUpdated([
-            'status' => 'success',
-            'message' => 'patient updated successfully',
-            'data' => $patient,
-            'errors' => null
-        ]);
 
+        $this->patientModel->update($id, $data);
+
+        return $this->response->setJSON([
+            'status' => 'success',
+            'message' => 'Patient updated',
+            'data' => $this->patientModel->findWithAge($id),
+            'errors' => '-',
+        ]);
     }
 
     public function delete($id = null)
     {
-        $patient = $this->patientService->delete($id);
-        if (isset($patient['error'])) {
-            if (($patient['code'] ?? 500) === 404) {
-                return $this->failNotFound($patient['error']);
-            }
+        $patient = $this->patientModel->find($id);
+
+        if (!$patient) {
+            return $this->response->setJSON([
+                'status' => 'failed',
+                'message' => 'Patient not found',
+                'data' => $id,
+                'errors' => '404',
+            ]);
         }
+
+        $this->patientModel->delete($id);
+
         return $this->respondDeleted([
             'status' => 'success',
-            'message' => 'patient deleted successfully',
+            'message' => 'Patient deleted successfully',
             'data' => $id,
-            'errors' => null
+            'errors' => '-',
         ]);
     }
 
     public function showByParent($parentID = null)
     {
-        $patients = $this->patientService->getByParent($parentID);
-        return $this->respond([
+        $page    = (int) ($this->request->getGet('page') ?? 1);
+        $perPage = (int) ($this->request->getGet('per_page') ?? 10);
+
+        $patients = $this->patientModel->getByParentWithAge((int) $parentID, $perPage, $page);
+        $pager    = $this->patientModel->pager;
+
+        return $this->response->setJSON([
             'status' => 'success',
-            'message' => 'patient data fetched',
+            'message' => 'Patients data fetched',
             'data' => $patients,
-            'errors' => null
+            'meta' => [
+                'total'        => $pager->getTotal(),
+                'per_page'     => $pager->getPerPage(),
+                'current_page' => $pager->getCurrentPage(),
+                'last_page'    => $pager->getPageCount(),
+            ],
         ]);
     }
-
-    // New Query Builder for v_patients view
 
     public function listWithParents(?int $parentId = null)
     {
-        return $this->respond([
+        $patients = $this->patientModel->getAllFromView($parentId);
+
+        return $this->response->setJSON([
             'status' => 'success',
-            'message' => 'patients with parents data fetched',
-            'data' => $this->patientService->listWithParents($parentId),
-            'errors' => null
+            'message' => 'Patients with parents data fetched',
+            'data' => $patients,
+            'errors' => null,
         ]);
     }
-
-    private function getRequestData(): array
-    {
-        $json = $this->request->getJSON(true);
-        if (is_array($json)) {
-            return $json;
-        }
-
-        $raw = $this->request->getRawInput();
-        if (is_array($raw) && $raw !== []) {
-            return $raw;
-        }
-
-        $post = $this->request->getPost();
-        return is_array($post) ? $post : [];
-    }
-
 }

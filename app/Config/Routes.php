@@ -27,7 +27,7 @@ $routes->group('api/v1', ['namespace' => 'App\Controllers\Api\V1', 'filter' => '
 
     $routes->resource('patients', ['controller' => 'PatientController', 'except' => ['show', 'edit']]);
     $routes->get('patients/(:num)', 'PatientController::show/$1');
-    $routes->get('patients/parent/(:num)', 'PatientController::showByParent/$1');
+    // $routes->get('patients/parent/(:num)', 'PatientController::showByParent/$1');
 
     // $routes->resource('schedules', ['controller' => 'ScheduleController']);
     // $routes->resource('servicetypes', ['controller' => 'ServiceTypeController']);
@@ -38,8 +38,8 @@ $routes->group('api/v1', ['namespace' => 'App\Controllers\Api\V1', 'filter' => '
     // $routes->resource('growthrecords', ['controller' => 'GrowthRecordController']);
 
     // new route for v_patients view
-    $routes->get('patients/with-parents', 'PatientController::listWithParents');
-    $routes->get('patients/with-parents/(:num)', 'PatientController::listWithParents/$1');
+    // $routes->get('patients/with-parents', 'PatientController::listWithParents');
+    // $routes->get('patients/with-parents/(:num)', 'PatientController::listWithParents/$1');
 
     // new route for v_queues
     $routes->get('queues/all', 'QueueController::listWithPatients');
