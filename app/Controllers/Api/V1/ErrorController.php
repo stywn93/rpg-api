@@ -2,7 +2,7 @@
 
 namespace App\Controllers\Api\V1;
 
-use App\Services\UserService;
+
 use CodeIgniter\RESTful\ResourceController;
 
 class ErrorController extends ResourceController

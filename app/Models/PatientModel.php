@@ -13,25 +13,25 @@ class PatientModel extends Model
     protected $useSoftDeletes   = true;
 
     protected $allowedFields = [
-        'parent_id',
-        'no_kk',
-        'nama',
-        'tanggal_lahir',
-        'jenis_kelamin',
-        'alamat',
+        'user_id',
+        'name',
+        'dob',
+        'gender_code',
+        'address',
     ];
 
     protected $useTimestamps = true;
     protected $dateFormat    = 'datetime';
     protected $createdField  = 'created_at';
     protected $updatedField  = 'updated_at';
+    protected $deletedField  = 'deleted_at';
 
     protected $validationRules = [
-        'parent_id'     => 'required|integer',
-        'no_kk'         => 'required',
-        'nama'          => 'required|min_length[3]',
-        'tanggal_lahir' => 'required|valid_date',
-        'jenis_kelamin' => 'required|in_list[L,P]',
+        'user_id'   => 'required|integer',
+        'name'      => 'required|min_length[3]',
+        'dob'       => 'required|valid_date',
+        'gender_code' => 'required|in_list[L,P]',
+        'address'   => 'required|min_length[5]',
     ];
 
     protected $skipValidation = false;
@@ -42,9 +42,9 @@ class PatientModel extends Model
     |--------------------------------------------------------------------------
     */
 
-    public function getPaginatedWithAge(int $perPage = 10): array
+    public function getPaginatedWithAge(int $perPage = 10, int $page = 1): array
     {
-        return $this->buildPatientWithAgeQuery()->paginate($perPage);
+        return $this->buildPatientWithAgeQuery()->paginate($perPage, 'default', $page);
     }
 
     public function findWithAge(int $id): ?array
@@ -54,11 +54,11 @@ class PatientModel extends Model
             ->first();
     }
 
-    public function getByParentWithAge(int $parentId, int $perPage = 10): array
+    public function getByParentWithAge(int $parentId, int $perPage = 10, int $page = 1): array
     {
         return $this->buildPatientWithAgeQuery()
-            ->where('patients.parent_id', $parentId)
-            ->paginate($perPage);
+            ->where('patients.user_id', $parentId)
+            ->paginate($perPage, 'default', $page);
     }
 
     private function buildPatientWithAgeQuery()
@@ -66,12 +66,12 @@ class PatientModel extends Model
         return $this->select(
             "patients.*, users.name as parent_name, users.email as parent_email,
             CONCAT(
-                TIMESTAMPDIFF(YEAR, patients.tanggal_lahir, CURRENT_DATE()),
+                TIMESTAMPDIFF(YEAR, patients.dob, CURRENT_DATE()),
                 ' tahun ',
-                MOD(TIMESTAMPDIFF(MONTH, patients.tanggal_lahir, CURRENT_DATE()), 12),
+                MOD(TIMESTAMPDIFF(MONTH, patients.dob, CURRENT_DATE()), 12),
                 ' bulan'
             ) AS usia"
-        )->join('users', 'users.id = patients.parent_id', 'left');
+        )->join('users', 'users.id = patients.user_id', 'left');
     }
 
     // New Query Builder for v_patients view
@@ -80,7 +80,7 @@ class PatientModel extends Model
         $builder = $this->db->table('v_patients');
 
         if ($parentId !== null) {
-            $builder->where('parent_id', $parentId);
+            $builder->where('user_id', $parentId);
         }
 
         return $builder->get()->getResultArray();

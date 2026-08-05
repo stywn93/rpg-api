@@ -2,22 +2,20 @@
 
 namespace App\Controllers\Api\V1;
 
-use App\Services\UserService;
 use CodeIgniter\RESTful\ResourceController;
 use App\Models\UserModel;
 
 class UserController extends ResourceController
 {
     protected $format = 'json';
-    protected $userService;
     protected $userModel;
 
     public function __construct(){
-        $this->userService = new UserService();
+
         $this->userModel = new UserModel();
     }
 
-    function index(){
+    public function index(){
         $page   = $this->request->getGet('page') ?? 1;
         $perPage = $this->request->getGet('per_page') ?? 3;
         
@@ -63,7 +61,12 @@ class UserController extends ResourceController
     public function show($id = null){
         $user = $this->userModel->find($id);
         if(!$user){
-            return $this->failNotFound("User not found");
+            return $this->response->setJSON([
+                'status' => 'failed',
+                'message' => 'User not found',
+                'data' => $id,
+                'errors' => '404'
+            ]);
         }
         return $this->response->setJSON([
             'status' => 'success',
@@ -77,7 +80,6 @@ class UserController extends ResourceController
     public function create(){
         $data = $this->request->getJSON(true);
         
-        // $data = $this->normalizeRolePayload($data);
         $data['password'] = password_hash($data['password'], PASSWORD_DEFAULT);
         if ($this->userModel->withDeleted()->where('email', $data['email'])->first()) {
             return $this->response->setJSON([
@@ -164,78 +166,5 @@ class UserController extends ResourceController
 
     }
 
-    public function updatePassword($id = null)
-    {
-        $data = $this->request->getJSON(true);
-
-        if (!isset($data['password']) || empty($data['password'])) {
-            return $this->failValidationErrors('Password is required');
-        }
-
-        $result = $this->userService->update($id, ['password' => $data['password']]);
-
-        if (isset($result['error'])) {
-            if (($result['code'] ?? 500) === 404) {
-                return $this->failNotFound($result['error']);
-            }
-
-            return $this->fail($result['error'], $result['code'] ?? 400);
-        }
-
-        return $this->respond([
-            'status' => 'success',
-            'message' => 'Password updated successfully',
-            'data' => null,
-            'errors' => null
-        ]);
-    }
-
     
-
-
-    public function activate($id){ 
-        $result = $this->userService->activate($id);
-
-        if (isset($result['error'])) {
-            if (($result['code'] ?? 500) === 404) {
-                return $this->failNotFound($result['error']);
-            }
-
-            if (($result['code'] ?? 500) === 422) {
-                return $this->failValidationErrors($result['error']);
-            }
-
-            return $this->fail($result['error'], $result['code'] ?? 400);
-        }
-
-        return $this->respond([
-            'status' => 'success',
-            'message' => 'User '. $id .' activated',
-            'data' => $id ?? null,
-            'errors' => null
-        ]);
-    }
-
-    public function suspend($id){
-        $result = $this->userService->suspend($id);
-
-        if (isset($result['error'])) {
-            if (($result['code'] ?? 500) === 404) {
-                return $this->failNotFound($result['error']);
-            }
-
-            if (($result['code'] ?? 500) === 422) {
-                return $this->failValidationErrors($result['error']);
-            }
-
-            return $this->fail($result['error'], $result['code'] ?? 400);
-        }
-
-        return $this->respond([
-            'status' => 'success',
-            'message' => 'User '. $id .' suspended',
-            'data' => $id ?? null,
-            'errors' => null
-        ]);
-    }
 }
