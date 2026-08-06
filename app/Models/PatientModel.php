@@ -70,7 +70,7 @@ class PatientModel extends Model
                 ' tahun ',
                 MOD(TIMESTAMPDIFF(MONTH, patients.dob, CURRENT_DATE()), 12),
                 ' bulan'
-            ) AS usia"
+            ) AS age"
         )->join('users', 'users.id = patients.user_id', 'left');
     }
 
