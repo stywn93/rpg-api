@@ -84,7 +84,7 @@ class VisitController extends ResourceController
         return $this->response->setJSON([
             'status' => 'success',
             'message' => 'Visit created',
-            'data' => $this->visitModel->find($this->visitModel->getInsertID()),
+            'data' => $this->visitModel->findWithPatient($this->visitModel->getInsertID()),
             'errors' => '-',
         ]);
     }
@@ -109,7 +109,7 @@ class VisitController extends ResourceController
         return $this->response->setJSON([
             'status' => 'success',
             'message' => 'Visit updated',
-            'data' => $this->visitModel->find($id),
+            'data' => $this->visitModel->findWithPatient($id),
             'errors' => '-',
         ]);
     }

@@ -47,7 +47,14 @@ class VisitModel extends Model
 
     private function buildVisitWithPatientQuery()
     {
-        return $this->select('visits.*, patients.name as patient_name')
-            ->join('patients', 'patients.id = visits.patient_id', 'left');
+        return $this->select(
+            "visits.*, patients.name as patient_name,
+            CONCAT(
+                TIMESTAMPDIFF(YEAR, patients.dob, CURRENT_DATE()),
+                ' tahun ',
+                MOD(TIMESTAMPDIFF(MONTH, patients.dob, CURRENT_DATE()), 12),
+                ' bulan'
+            ) AS age"
+        )->join('patients', 'patients.id = visits.patient_id', 'left');
     }
 }
