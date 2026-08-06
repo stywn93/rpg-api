@@ -26,4 +26,28 @@ class VisitModel extends Model
 
     protected $validationMessages = [];
     protected $skipValidation = false;
+
+    /*
+    |--------------------------------------------------------------------------
+    | Custom Query Join Patient
+    |--------------------------------------------------------------------------
+    */
+
+    public function getPaginatedWithPatient(int $perPage = 10, int $page = 1): array
+    {
+        return $this->buildVisitWithPatientQuery()->paginate($perPage, 'default', $page);
+    }
+
+    public function findWithPatient(int $id): ?array
+    {
+        return $this->buildVisitWithPatientQuery()
+            ->where('visits.id', $id)
+            ->first();
+    }
+
+    private function buildVisitWithPatientQuery()
+    {
+        return $this->select('visits.*, patients.name as patient_name')
+            ->join('patients', 'patients.id = visits.patient_id', 'left');
+    }
 }

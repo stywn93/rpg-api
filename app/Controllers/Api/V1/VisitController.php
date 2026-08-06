@@ -30,7 +30,7 @@ class VisitController extends ResourceController
             $this->visitModel->where('visit_date', $visitDate);
         }
 
-        $visits = $this->visitModel->paginate($perPage, 'default', $page);
+        $visits = $this->visitModel->getPaginatedWithPatient($perPage, $page);
         $pager  = $this->visitModel->pager;
 
         return $this->response->setJSON([
@@ -48,7 +48,7 @@ class VisitController extends ResourceController
 
     public function show($id = null)
     {
-        $visit = $this->visitModel->find($id);
+        $visit = $this->visitModel->findWithPatient($id);
 
         if (!$visit) {
             return $this->response->setJSON([

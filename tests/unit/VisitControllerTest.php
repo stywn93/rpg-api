@@ -22,12 +22,12 @@ final class VisitControllerTest extends CIUnitTestCase
     {
         $visitModel = $this->getMockBuilder(VisitModel::class)
             ->disableOriginalConstructor()
-            ->onlyMethods(['paginate'])
+            ->onlyMethods(['getPaginatedWithPatient'])
             ->getMock();
 
         $visitModel->expects($this->once())
-            ->method('paginate')
-            ->with(10, 'default', 1)
+            ->method('getPaginatedWithPatient')
+            ->with(10, 1)
             ->willReturn([]);
 
         $pager = new class {
