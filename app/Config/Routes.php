@@ -44,6 +44,9 @@ $routes->group('api/v1', ['namespace' => 'App\Controllers\Api\V1', 'filter' => '
     // new route for v_queues
     $routes->get('queues/all', 'QueueController::listWithPatients');
     $routes->patch('queues/(:num)', 'QueueController::update/$1');
+
+    $routes->resource('medical-services', ['controller' => 'MedicalServiceController', 'except' => ['show', 'edit']]);
+    $routes->get('medical-services/(:num)', 'MedicalServiceController::show/$1');
     
 });
 
