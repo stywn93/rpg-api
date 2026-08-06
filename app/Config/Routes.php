@@ -47,6 +47,8 @@ $routes->group('api/v1', ['namespace' => 'App\Controllers\Api\V1', 'filter' => '
 
     $routes->resource('visits', ['controller' => 'VisitController', 'except' => ['new','show', 'edit']]);
     $routes->get('visits/(:num)', 'VisitController::show/$1');
+    $routes->resource('medical-services', ['controller' => 'MedicalServiceController', 'except' => ['show', 'edit']]);
+    $routes->get('medical-services/(:num)', 'MedicalServiceController::show/$1');
     
 });
 
