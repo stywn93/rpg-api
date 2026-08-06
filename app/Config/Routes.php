@@ -25,7 +25,7 @@ $routes->group('api/v1', ['namespace' => 'App\Controllers\Api\V1', 'filter' => '
     // $routes->post('users/(:num)/suspend', 'UserController::suspend/$1');
 
 
-    $routes->resource('patients', ['controller' => 'PatientController', 'except' => ['show', 'edit']]);
+    $routes->resource('patients', ['controller' => 'PatientController', 'except' => ['new', 'show', 'edit']]);
     $routes->get('patients/(:num)', 'PatientController::show/$1');
     // $routes->get('patients/parent/(:num)', 'PatientController::showByParent/$1');
 
@@ -45,6 +45,8 @@ $routes->group('api/v1', ['namespace' => 'App\Controllers\Api\V1', 'filter' => '
     $routes->get('queues/all', 'QueueController::listWithPatients');
     $routes->patch('queues/(:num)', 'QueueController::update/$1');
 
+    $routes->resource('visits', ['controller' => 'VisitController', 'except' => ['new','show', 'edit']]);
+    $routes->get('visits/(:num)', 'VisitController::show/$1');
     $routes->resource('medical-services', ['controller' => 'MedicalServiceController', 'except' => ['show', 'edit']]);
     $routes->get('medical-services/(:num)', 'MedicalServiceController::show/$1');
     
