@@ -22,11 +22,11 @@ final class VisitServiceControllerTest extends CIUnitTestCase
     {
         $visitServiceModel = $this->getMockBuilder(VisitServiceModel::class)
             ->disableOriginalConstructor()
-            ->onlyMethods(['getPaginatedWithDetails'])
+            ->onlyMethods(['getVisitServicesWithPatient'])
             ->getMock();
 
         $visitServiceModel->expects($this->once())
-            ->method('getPaginatedWithDetails')
+            ->method('getVisitServicesWithPatient')
             ->with(10, 1)
             ->willReturn([]);
 
