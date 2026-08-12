@@ -25,16 +25,16 @@ class VisitServiceController extends ResourceController
         $performedBy = trim((string) $this->request->getGet('performed_by') ?? '');
 
         if ($visitId !== '') {
-            $this->visitServiceModel->where('visit_services.visit_id', $visitId);
+            $this->visitServiceModel->where('vs.visit_id', $visitId);
         }
         if ($serviceId !== '') {
-            $this->visitServiceModel->where('visit_services.service_id', $serviceId);
+            $this->visitServiceModel->where('vs.service_id', $serviceId);
         }
         if ($performedBy !== '') {
-            $this->visitServiceModel->where('visit_services.performed_by', $performedBy);
+            $this->visitServiceModel->where('vs.performed_by', $performedBy);
         }
 
-        $visitServices = $this->visitServiceModel->getPaginatedWithDetails($perPage, $page);
+        $visitServices = $this->visitServiceModel->getVisitServicesWithPatient($perPage, $page);
         $pager         = $this->visitServiceModel->pager;
 
         return $this->response->setJSON([

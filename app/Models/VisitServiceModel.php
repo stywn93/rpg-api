@@ -60,4 +60,43 @@ class VisitServiceModel extends Model
             ->join('patients', 'patients.id = visits.patient_id', 'left')
             ->join('users', 'users.id = visit_services.performed_by', 'left');
     }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Custom Query Join Patient (per visit_service)
+    |--------------------------------------------------------------------------
+    */
+
+    public function getVisitServicesWithPatient(int $perPage = 10, int $page = 1): array
+    {
+        $select = "p.name AS patient_name,
+            CONCAT(
+                FLOOR(TIMESTAMPDIFF(MONTH, p.dob, CURRENT_DATE()) / 12),
+                ' tahun ',
+                MOD(TIMESTAMPDIFF(MONTH, p.dob, CURRENT_DATE()), 12),
+                ' bulan'
+            ) AS age,
+            CASE p.gender_code
+                WHEN 'L' THEN 'Laki-laki'
+                WHEN 'P' THEN 'Perempuan'
+            END AS gender,
+            u.name AS parent_name,
+            v.id AS visit_id,
+            v.visit_date,
+            ms.service_name AS service,
+            vs.result,
+            vs.performed_by,
+            performer.name AS performed_by_name";
+
+        return $this->select($select, false)
+            ->from('patients p', true)
+            ->join('users u', 'u.id = p.user_id')
+            ->join('visits v', 'v.patient_id = p.id')
+            ->join('visit_services vs', 'vs.visit_id = v.id')
+            ->join('medical_services ms', 'ms.service_id = vs.service_id')
+            ->join('users performer', 'performer.id = vs.performed_by', 'left')
+            ->where('p.deleted_at', null)
+            ->where('u.deleted_at', null)
+            ->paginate($perPage, 'default', $page);
+    }
 }
