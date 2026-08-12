@@ -83,10 +83,8 @@ class VisitServiceModel extends Model
             u.name AS parent_name,
             v.id AS visit_id,
             v.visit_date,
-            ms.service_name AS service,
-            vs.result,
-            vs.performed_by,
-            performer.name AS performed_by_name";
+            GROUP_CONCAT(ms.service_name SEPARATOR ', ') AS services
+            ";
 
         return $this->select($select, false)
             ->from('patients p', true)
@@ -94,9 +92,9 @@ class VisitServiceModel extends Model
             ->join('visits v', 'v.patient_id = p.id')
             ->join('visit_services vs', 'vs.visit_id = v.id')
             ->join('medical_services ms', 'ms.service_id = vs.service_id')
-            ->join('users performer', 'performer.id = vs.performed_by', 'left')
             ->where('p.deleted_at', null)
             ->where('u.deleted_at', null)
+            ->groupBy('p.id, u.id, v.id')
             ->paginate($perPage, 'default', $page);
     }
 }
