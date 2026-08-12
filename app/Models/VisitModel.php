@@ -15,6 +15,7 @@ class VisitModel extends Model
     protected $allowedFields = [
         'patient_id',
         'visit_date',
+        'visit_status',
     ];
 
     protected $useTimestamps = false;
