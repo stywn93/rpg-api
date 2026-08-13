@@ -83,6 +83,7 @@ class VisitServiceModel extends Model
             u.name AS parent_name,
             v.id AS visit_id,
             v.visit_date,
+            v.visit_status,
             GROUP_CONCAT(ms.service_name SEPARATOR ', ') AS services
             ";
 
