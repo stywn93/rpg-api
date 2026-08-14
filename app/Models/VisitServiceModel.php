@@ -67,7 +67,7 @@ class VisitServiceModel extends Model
     |--------------------------------------------------------------------------
     */
 
-    public function getVisitServicesWithPatient(int $perPage = 10, int $page = 1): array
+    public function getVisitServicesWithPatient(int $perPage = 10, int $page = 1, array $filters = []): array
     {
         $select = "p.name AS patient_name,
             CONCAT(
@@ -87,15 +87,46 @@ class VisitServiceModel extends Model
             GROUP_CONCAT(ms.service_name SEPARATOR ', ') AS services
             ";
 
-        return $this->select($select, false)
+        $query = $this->select($select, false)
             ->from('patients p', true)
             ->join('users u', 'u.id = p.user_id')
             ->join('visits v', 'v.patient_id = p.id')
             ->join('visit_services vs', 'vs.visit_id = v.id')
             ->join('medical_services ms', 'ms.service_id = vs.service_id')
             ->where('p.deleted_at', null)
-            ->where('u.deleted_at', null)
-            ->groupBy('p.id, u.id, v.id')
+            ->where('u.deleted_at', null);
+
+        if (!empty($filters['visit_id'])) {
+            $query->where('vs.visit_id', $filters['visit_id']);
+        }
+        if (!empty($filters['service_id'])) {
+            $query->where('vs.service_id', $filters['service_id']);
+        }
+        if (!empty($filters['performed_by'])) {
+            $query->where('vs.performed_by', $filters['performed_by']);
+        }
+        if (!empty($filters['visit_date'])) {
+            $query->where('v.visit_date', $filters['visit_date']);
+        }
+        if (!empty($filters['visit_status'])) {
+            $query->where('v.visit_status', $filters['visit_status']);
+        }
+        if (!empty($filters['patient_name'])) {
+            $query->like('p.name', $filters['patient_name']);
+        }
+        if (!empty($filters['parent_id'])) {
+            $query->where('u.id', $filters['parent_id']);
+        }
+        if (!empty($filters['gender'])) {
+            $genderCode = match (strtolower($filters['gender'])) {
+                'laki-laki' => 'L',
+                'perempuan' => 'P',
+                default     => $filters['gender'],
+            };
+            $query->where('p.gender_code', $genderCode);
+        }
+
+        return $query->groupBy('p.id, u.id, v.id')
             ->paginate($perPage, 'default', $page);
     }
 }

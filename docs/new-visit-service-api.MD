@@ -59,11 +59,17 @@ consistent `$this->response->setJSON()` response shape with
 ## 2. `VisitServiceController`
 
 - Uses `VisitServiceModel` directly in the constructor.
-- **`index()`**: `page` + `per_page` (defaults 1 / 10); filters:
-  - `visit_services.visit_id` -> `where`
-  - `visit_services.service_id` -> `where`
-  - `visit_services.performed_by` -> `where`
-  - paginate via `getPaginatedWithDetails`; return `setJSON` with `meta`.
+- **`index()`**: `page` + `per_page` (defaults 1 / 10); filters (passed to
+  `getVisitServicesWithPatient` as an array; empty values are dropped):
+  - `visit_id` -> `where visit_services.visit_id`
+  - `service_id` -> `where visit_services.service_id`
+  - `performed_by` -> `where visit_services.performed_by`
+  - `visit_date` -> `where visits.visit_date`
+  - `visit_status` -> `where visits.visit_status`
+  - `patient_name` -> `like patients.name`
+  - `parent_id` -> `where users.id`
+  - `gender` -> accepts `L`/`P` or `Laki-laki`/`Perempuan`, `where patients.gender_code`
+  - paginate via `getVisitServicesWithPatient`; return `setJSON` with `meta`.
 - **`show($id)`**: `findWithDetails`; 404 via `setJSON`
   `{status:'failed', message:'Visit service not found', data:$id, errors:'404'}`.
 - **`create()`**: `getJSON(true)`; insert failure -> model errors; success returns
