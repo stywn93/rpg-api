@@ -20,21 +20,18 @@ class VisitServiceController extends ResourceController
         $page    = (int) ($this->request->getGet('page') ?? 1);
         $perPage = (int) ($this->request->getGet('per_page') ?? 10);
 
-        $visitId     = trim((string) $this->request->getGet('visit_id') ?? '');
-        $serviceId   = trim((string) $this->request->getGet('service_id') ?? '');
-        $performedBy = trim((string) $this->request->getGet('performed_by') ?? '');
+        $filters = array_filter([
+            'visit_id'     => trim((string) ($this->request->getGet('visit_id') ?? '')),
+            'service_id'   => trim((string) ($this->request->getGet('service_id') ?? '')),
+            'performed_by' => trim((string) ($this->request->getGet('performed_by') ?? '')),
+            'visit_date'   => trim((string) ($this->request->getGet('visit_date') ?? '')),
+            'visit_status' => trim((string) ($this->request->getGet('visit_status') ?? '')),
+            'patient_name' => trim((string) ($this->request->getGet('patient_name') ?? '')),
+            'parent_id'    => trim((string) ($this->request->getGet('parent_id') ?? '')),
+            'gender'       => trim((string) ($this->request->getGet('gender') ?? '')),
+        ], fn ($value) => $value !== '');
 
-        if ($visitId !== '') {
-            $this->visitServiceModel->where('vs.visit_id', $visitId);
-        }
-        if ($serviceId !== '') {
-            $this->visitServiceModel->where('vs.service_id', $serviceId);
-        }
-        if ($performedBy !== '') {
-            $this->visitServiceModel->where('vs.performed_by', $performedBy);
-        }
-
-        $visitServices = $this->visitServiceModel->getVisitServicesWithPatient($perPage, $page);
+        $visitServices = $this->visitServiceModel->getVisitServicesWithPatient($perPage, $page, $filters);
         $pager         = $this->visitServiceModel->pager;
 
         return $this->response->setJSON([
