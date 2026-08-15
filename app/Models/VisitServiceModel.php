@@ -84,7 +84,8 @@ class VisitServiceModel extends Model
             v.id AS visit_id,
             v.visit_date,
             v.visit_status,
-            GROUP_CONCAT(ms.service_name SEPARATOR ', ') AS services
+            GROUP_CONCAT(ms.service_name SEPARATOR ', ') AS services,
+            GROUP_CONCAT(ms.service_id SEPARATOR ', ') AS service_id
             ";
 
         $query = $this->select($select, false)
