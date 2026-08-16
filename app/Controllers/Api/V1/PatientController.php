@@ -25,13 +25,13 @@ class PatientController extends ResourceController
         $userId     = trim((string) $this->request->getGet('user_id') ?? '');
 
         if ($name !== '') {
-            $this->patientModel->like('name', $name);
+            $this->patientModel->like('patients.name', $name);
         }
         if ($genderCode !== '') {
-            $this->patientModel->where('gender_code', $genderCode);
+            $this->patientModel->where('patients.gender_code', $genderCode);
         }
         if ($userId !== '') {
-            $this->patientModel->where('user_id', $userId);
+            $this->patientModel->where('patients.user_id', $userId);
         }
 
         $patients = $this->patientModel->getPaginatedWithAge($perPage, $page);
