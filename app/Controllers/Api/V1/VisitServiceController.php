@@ -29,6 +29,7 @@ class VisitServiceController extends ResourceController
             'patient_name' => trim((string) ($this->request->getGet('patient_name') ?? '')),
             'parent_id'    => trim((string) ($this->request->getGet('parent_id') ?? '')),
             'gender'       => trim((string) ($this->request->getGet('gender') ?? '')),
+            'patient_id'   => trim((string) ($this->request->getGet('patient_id') ?? '')),
         ], fn ($value) => $value !== '');
 
         $visitServices = $this->visitServiceModel->getVisitServicesWithPatient($perPage, $page, $filters);

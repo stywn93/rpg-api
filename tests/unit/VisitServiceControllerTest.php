@@ -79,6 +79,7 @@ final class VisitServiceControllerTest extends CIUnitTestCase
             'visit_status' => 'done',
             'gender'       => 'Laki-laki',
             'patient_name' => 'Budi',
+            'patient_id'   => '5',
         ]);
 
         $visitServiceModel = $this->getMockBuilder(VisitServiceModel::class)
@@ -92,6 +93,7 @@ final class VisitServiceControllerTest extends CIUnitTestCase
                 'visit_status' => 'done',
                 'patient_name' => 'Budi',
                 'gender'       => 'Laki-laki',
+                'patient_id'   => '5',
             ])
             ->willReturn([]);
 

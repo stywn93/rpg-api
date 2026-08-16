@@ -69,7 +69,8 @@ class VisitServiceModel extends Model
 
     public function getVisitServicesWithPatient(int $perPage = 10, int $page = 1, array $filters = []): array
     {
-        $select = "p.name AS patient_name,
+        $select = "p.id AS patient_id,
+            p.name AS patient_name,
             CONCAT(
                 FLOOR(TIMESTAMPDIFF(MONTH, p.dob, CURRENT_DATE()) / 12),
                 ' tahun ',
@@ -114,6 +115,9 @@ class VisitServiceModel extends Model
         }
         if (!empty($filters['patient_name'])) {
             $query->like('p.name', $filters['patient_name']);
+        }
+        if (!empty($filters['patient_id'])) {
+            $query->where('p.id', $filters['patient_id']);
         }
         if (!empty($filters['parent_id'])) {
             $query->where('u.id', $filters['parent_id']);
