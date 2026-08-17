@@ -20,14 +20,22 @@ class VisitController extends ResourceController
         $page    = (int) ($this->request->getGet('page') ?? 1);
         $perPage = (int) ($this->request->getGet('per_page') ?? 10);
 
-        $patientId = trim((string) $this->request->getGet('patient_id') ?? '');
-        $visitDate = trim((string) $this->request->getGet('visit_date') ?? '');
+        $patientId   = trim((string) $this->request->getGet('patient_id') ?? '');
+        $visitDate   = trim((string) $this->request->getGet('visit_date') ?? '');
+        $patientName = trim((string) $this->request->getGet('patient_name') ?? '');
+        $visitStatus = trim((string) $this->request->getGet('visit_status') ?? '');
 
         if ($patientId !== '') {
             $this->visitModel->where('patient_id', $patientId);
         }
         if ($visitDate !== '') {
             $this->visitModel->where('visit_date', $visitDate);
+        }
+        if ($patientName !== '') {
+            $this->visitModel->like('patients.name', $patientName);
+        }
+        if ($visitStatus !== '') {
+            $this->visitModel->where('visit_status', $visitStatus);
         }
 
         $visits = $this->visitModel->getPaginatedWithPatient($perPage, $page);
@@ -46,6 +54,57 @@ class VisitController extends ResourceController
         ]);
     }
 
+    public function indexByParent()
+    {
+        $page    = (int) ($this->request->getGet('page') ?? 1);
+        $perPage = (int) ($this->request->getGet('per_page') ?? 10);
+
+        $parentId = trim((string) $this->request->getGet('parent_id') ?? '');
+
+        if ($parentId === '') {
+            return $this->response
+                ->setStatusCode(400)
+                ->setJSON([
+                    'status' => 'failed',
+                    'message' => 'parent_id is required',
+                    'data' => null,
+                    'errors' => '400',
+                ]);
+        }
+
+        $patientId   = trim((string) $this->request->getGet('patient_id') ?? '');
+        $visitDate   = trim((string) $this->request->getGet('visit_date') ?? '');
+        $patientName = trim((string) $this->request->getGet('patient_name') ?? '');
+        $visitStatus = trim((string) $this->request->getGet('visit_status') ?? '');
+
+        if ($patientId !== '') {
+            $this->visitModel->where('patient_id', $patientId);
+        }
+        if ($visitDate !== '') {
+            $this->visitModel->where('visit_date', $visitDate);
+        }
+        if ($patientName !== '') {
+            $this->visitModel->like('patients.name', $patientName);
+        }
+        if ($visitStatus !== '') {
+            $this->visitModel->where('visit_status', $visitStatus);
+        }
+
+        $visits = $this->visitModel->getPaginatedByParentWithPatient((int) $parentId, $perPage, $page);
+        $pager  = $this->visitModel->pager;
+
+        return $this->response->setJSON([
+            'status' => 'success',
+            'message' => 'Visits data fetched',
+            'data' => $visits,
+            'meta' => [
+                'total'        => $pager->getTotal(),
+                'per_page'     => $pager->getPerPage(),
+                'current_page' => $pager->getCurrentPage(),
+                'last_page'    => $pager->getPageCount(),
+            ],
+        ]);
+    }
     public function show($id = null)
     {
         $visit = $this->visitModel->findWithPatient($id);
