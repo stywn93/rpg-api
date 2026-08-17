@@ -39,6 +39,13 @@ class VisitModel extends Model
         return $this->buildVisitWithPatientQuery()->paginate($perPage, 'default', $page);
     }
 
+    public function getPaginatedByParentWithPatient(int $parentId, int $perPage = 10, int $page = 1): array
+    {
+        return $this->buildVisitWithPatientQuery()
+            ->where('patients.user_id', $parentId)
+            ->paginate($perPage, 'default', $page);
+    }
+
     public function findWithPatient(int $id): ?array
     {
         return $this->buildVisitWithPatientQuery()
@@ -50,12 +57,19 @@ class VisitModel extends Model
     {
         return $this->select(
             "visits.*, patients.name as patient_name,
+            users.name as parent_name,
+            CASE patients.gender_code
+                WHEN 'L' THEN 'Laki-laki'
+                WHEN 'P' THEN 'Perempuan'
+            END AS patient_gender,
             CONCAT(
                 TIMESTAMPDIFF(YEAR, patients.dob, CURRENT_DATE()),
                 ' tahun ',
                 MOD(TIMESTAMPDIFF(MONTH, patients.dob, CURRENT_DATE()), 12),
                 ' bulan'
             ) AS age"
-        )->join('patients', 'patients.id = visits.patient_id', 'left');
+        )
+            ->join('patients', 'patients.id = visits.patient_id', 'left')
+            ->join('users', 'users.id = patients.user_id', 'left');
     }
 }
