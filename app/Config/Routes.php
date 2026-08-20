@@ -27,7 +27,7 @@ $routes->group('api/v1', ['namespace' => 'App\Controllers\Api\V1', 'filter' => '
 
     $routes->resource('patients', ['controller' => 'PatientController', 'except' => ['new', 'show', 'edit']]);
     $routes->get('patients/(:num)', 'PatientController::show/$1');
-    // $routes->get('patients/parent/(:num)', 'PatientController::showByParent/$1');
+    $routes->get('patients/parent/(:num)', 'PatientController::showByParent/$1');
 
     // $routes->resource('schedules', ['controller' => 'ScheduleController']);
     // $routes->resource('servicetypes', ['controller' => 'ServiceTypeController']);
