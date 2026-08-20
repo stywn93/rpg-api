@@ -51,7 +51,9 @@ $routes->group('api/v1', ['namespace' => 'App\Controllers\Api\V1', 'filter' => '
     $routes->resource('medical-services', ['controller' => 'MedicalServiceController', 'except' => ['show', 'edit']]);
     $routes->get('medical-services/(:num)', 'MedicalServiceController::show/$1');
 
-    $routes->resource('visit-services', ['controller' => 'VisitServiceController', 'except' => ['new', 'show', 'edit']]);
+    $routes->resource('visit-services', ['controller' => 'VisitServiceController', 'except' => ['new', 'show', 'edit', 'update']]);
+    // tambahan route untuk diff and sync services
+    $routes->put('visit-services/(:num)', 'VisitServiceController::updateServices/$1');
     $routes->get('visit-services/(:num)', 'VisitServiceController::show/$1');
     
 });

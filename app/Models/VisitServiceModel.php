@@ -134,4 +134,51 @@ class VisitServiceModel extends Model
         return $query->groupBy('p.id, u.id, v.id')
             ->paginate($perPage, 'default', $page);
     }
+
+    public function syncVisitServices(int $visitId, array $newServiceIds): bool
+    {
+        $db = \Config\Database::connect();
+        $db->transStart();
+
+        $oldServiceIds = $db->table('visit_services')
+            ->select('service_id')
+            ->where('visit_id', $visitId)
+            ->get()
+            ->getResultArray();
+        $oldServiceIds = array_column($oldServiceIds, 'service_id');
+
+        $toInsert = array_diff($newServiceIds, $oldServiceIds);
+        $toDelete = array_diff($oldServiceIds, $newServiceIds);
+
+        if (!empty($toDelete)) {
+            $db->table('visit_services')
+                ->where('visit_id', $visitId)
+                ->whereIn('service_id', $toDelete)
+                ->delete();
+        }
+
+        if (!empty($toInsert)) {
+            $insertBatch = array_map(fn($sid) => [
+                'visit_id'   => $visitId,
+                'service_id' => $sid,
+            ], $toInsert);
+
+            $db->table('visit_services')->insertBatch($insertBatch);
+        }
+
+        $db->transComplete();
+
+        return $db->transStatus();
+    }
+
+    public function getServicesWithDetail(int $visitId): array
+    {
+        return $this->db->table('visit_services vs')
+            ->select('s.service_id, s.service_name')
+            ->join('medical_services s', 's.service_id = vs.service_id')
+            ->where('vs.visit_id', $visitId)
+            ->get()
+            ->getResultArray();
+    }
+
 }

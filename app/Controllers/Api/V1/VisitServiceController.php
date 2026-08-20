@@ -2,6 +2,8 @@
 
 namespace App\Controllers\Api\V1;
 
+use App\Models\VisitModel;
+use App\Models\MedicalServiceModel;
 use App\Models\VisitServiceModel;
 use CodeIgniter\RESTful\ResourceController;
 
@@ -9,10 +11,14 @@ class VisitServiceController extends ResourceController
 {
     protected $format = 'json';
     protected $visitServiceModel;
+    protected $visitModel;
+    protected $serviceModel;
 
     public function __construct()
     {
         $this->visitServiceModel = new VisitServiceModel();
+        $this->visitModel = new VisitModel();
+        $this->serviceModel = new MedicalServiceModel();
     }
 
     public function index()
@@ -138,4 +144,51 @@ class VisitServiceController extends ResourceController
             'errors' => '-',
         ]);
     }
+
+
+    // app/Controllers/Api/VisitController.php
+    public function updateServices($visitId = null)
+    {
+        $visit = $this->visitModel->find($visitId);
+        if (!$visit) {
+            return $this->failNotFound('Visit not found');
+        }
+
+        $rules = [
+            'service_id'   => 'required|is_array',
+            'service_id.*' => 'required|is_natural_no_zero',
+        ];
+
+        if (!$this->validate($rules)) {
+            return $this->failValidationErrors($this->validator->getErrors());
+        }
+
+        $serviceIds = $this->request->getJSON(true)['service_id'];
+        $serviceIds = array_unique($serviceIds);
+
+        // Pastikan semua service_id valid
+        $existingCount = $this->serviceModel->whereIn('service_id', $serviceIds)->countAllResults();
+        if ($existingCount !== count($serviceIds)) {
+            return $this->failValidationErrors(['service_id' => 'Ada service_id yang tidak valid']);
+        }
+
+        $success = $this->visitServiceModel->syncVisitServices($visitId, $serviceIds);
+
+        if (!$success) {
+            return $this->failServerError('Failed to sync visit services');
+        }
+
+        $result = $this->visitServiceModel->getServicesWithDetail($visitId);
+
+        return $this->respond([
+            'status'  => 200,
+            'message' => 'Visit services updated successfully',
+            'data'  => $visit,
+            'service_ids' => $serviceIds,
+            'existing_count' => $existingCount,
+            'result' => $result,
+        ]);
+    }
+
+
 }
