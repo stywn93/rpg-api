@@ -29,13 +29,14 @@ class RateLimiterFilter implements FilterInterface
         $throttler = Services::throttler();
 
         $key = $request->getIPAddress();
-        // 3 requests in a minute
-        if (! $throttler->check($key, 3, MINUTE)) {
+        // 10 requests in a minute
+        if (! $throttler->check($key, 10, MINUTE)) {
             return Services::response()
                 ->setStatusCode(429)
                 ->setJSON([
-                    'status' => 429,
-                    'error'  => 'Too Many Requests. Try again later.'
+                    'status'   => 429,
+                    'error'    => 429,
+                    'messages' => ['error' => 'Too Many Requests. Try again later.'],
                 ]);
         }
         //
