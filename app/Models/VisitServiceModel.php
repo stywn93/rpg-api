@@ -89,15 +89,60 @@ class VisitServiceModel extends Model
             GROUP_CONCAT(ms.service_id SEPARATOR ', ') AS service_id
             ";
 
-        $query = $this->select($select, false)
-            ->from('patients p', true)
+        $query = $this->buildVisitServicesBaseQuery()
+            ->select($select, false);
+
+        $this->applyVisitServiceFilters($query, $filters);
+
+        return $query->groupBy('p.id, u.id, v.id')
+            ->paginate($perPage, 'default', $page);
+    }
+
+    public function getVisitServiceRows(int $perPage = 10, int $page = 1, array $filters = []): array
+    {
+        $select = "p.id AS patient_id,
+            p.name AS patient_name,
+            CONCAT(
+                FLOOR(TIMESTAMPDIFF(MONTH, p.dob, CURRENT_DATE()) / 12),
+                ' tahun ',
+                MOD(TIMESTAMPDIFF(MONTH, p.dob, CURRENT_DATE()), 12),
+                ' bulan'
+            ) AS age,
+            CASE p.gender_code
+                WHEN 'L' THEN 'Laki-laki'
+                WHEN 'P' THEN 'Perempuan'
+            END AS gender,
+            u.name AS parent_name,
+            v.id AS visit_id,
+            v.visit_date,
+            v.visit_status,
+            vs.visit_service_id,
+            vs.service_id,
+            ms.service_name
+            ";
+
+        $query = $this->buildVisitServicesBaseQuery()
+            ->select($select, false);
+
+        $this->applyVisitServiceFilters($query, $filters);
+
+        return $query->orderBy('vs.visit_service_id', 'ASC')
+            ->paginate($perPage, 'default', $page);
+    }
+
+    private function buildVisitServicesBaseQuery()
+    {
+        return $this->from('patients p', true)
             ->join('users u', 'u.id = p.user_id')
             ->join('visits v', 'v.patient_id = p.id')
             ->join('visit_services vs', 'vs.visit_id = v.id')
             ->join('medical_services ms', 'ms.service_id = vs.service_id')
             ->where('p.deleted_at', null)
             ->where('u.deleted_at', null);
+    }
 
+    private function applyVisitServiceFilters($query, array $filters): void
+    {
         if (!empty($filters['visit_id'])) {
             $query->where('vs.visit_id', $filters['visit_id']);
         }
@@ -130,9 +175,6 @@ class VisitServiceModel extends Model
             };
             $query->where('p.gender_code', $genderCode);
         }
-
-        return $query->groupBy('p.id, u.id, v.id')
-            ->paginate($perPage, 'default', $page);
     }
 
     public function syncVisitServices(int $visitId, array $newServiceIds): bool

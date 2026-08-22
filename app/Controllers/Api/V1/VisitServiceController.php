@@ -21,12 +21,9 @@ class VisitServiceController extends ResourceController
         $this->serviceModel = new MedicalServiceModel();
     }
 
-    public function index()
+    private function getVisitServiceFilters(): array
     {
-        $page    = (int) ($this->request->getGet('page') ?? 1);
-        $perPage = (int) ($this->request->getGet('per_page') ?? 10);
-
-        $filters = array_filter([
+        return array_filter([
             'visit_id'     => trim((string) ($this->request->getGet('visit_id') ?? '')),
             'service_id'   => trim((string) ($this->request->getGet('service_id') ?? '')),
             'performed_by' => trim((string) ($this->request->getGet('performed_by') ?? '')),
@@ -37,6 +34,14 @@ class VisitServiceController extends ResourceController
             'gender'       => trim((string) ($this->request->getGet('gender') ?? '')),
             'patient_id'   => trim((string) ($this->request->getGet('patient_id') ?? '')),
         ], fn ($value) => $value !== '');
+    }
+
+    public function index()
+    {
+        $page    = (int) ($this->request->getGet('page') ?? 1);
+        $perPage = (int) ($this->request->getGet('per_page') ?? 10);
+
+        $filters = $this->getVisitServiceFilters();
 
         $visitServices = $this->visitServiceModel->getVisitServicesWithPatient($perPage, $page, $filters);
         $pager         = $this->visitServiceModel->pager;
@@ -46,6 +51,28 @@ class VisitServiceController extends ResourceController
             'message' => 'Visit services data fetched',
             'data' => $visitServices,
             'meta' => [
+                'total'        => $pager->getTotal(),
+                'per_page'     => $pager->getPerPage(),
+                'current_page' => $pager->getCurrentPage(),
+                'last_page'    => $pager->getPageCount(),
+            ],
+        ]);
+    }
+
+    public function rows()
+    {
+        $page    = (int) ($this->request->getGet('page') ?? 1);
+        $perPage = (int) ($this->request->getGet('per_page') ?? 10);
+
+        $filters     = $this->getVisitServiceFilters();
+        $serviceRows = $this->visitServiceModel->getVisitServiceRows($perPage, $page, $filters);
+        $pager       = $this->visitServiceModel->pager;
+
+        return $this->response->setJSON([
+            'status'  => 'success',
+            'message' => 'Visit service rows data fetched',
+            'data'    => $serviceRows,
+            'meta'    => [
                 'total'        => $pager->getTotal(),
                 'per_page'     => $pager->getPerPage(),
                 'current_page' => $pager->getCurrentPage(),
@@ -99,11 +126,9 @@ class VisitServiceController extends ResourceController
 
     public function update($id = null)
     {
-        $data = $this->request->getJSON(true);
+        $existing = $this->visitServiceModel->find($id);
 
-        $visitService = $this->visitServiceModel->find($id);
-
-        if (!$visitService) {
+        if (!$existing) {
             return $this->response->setJSON([
                 'status' => 'failed',
                 'message' => 'Visit service not found',
@@ -112,12 +137,32 @@ class VisitServiceController extends ResourceController
             ]);
         }
 
-        $this->visitServiceModel->update($id, $data);
+        $data = $this->request->getJSON(true);
+        if (empty($data)) {
+            return $this->response->setJSON([
+                'status' => 'failed',
+                'message' => 'No data provided',
+                'data' => $id,
+                'errors' => '400',
+            ]);
+        }
+
+        // Merge data existing agar rule "required" di model lolos untuk PATCH parsial
+        $merged = array_merge($existing, $data);
+
+        if ($this->visitServiceModel->update($id, $merged) === false) {
+            return $this->response->setJSON([
+                'status' => 'failed',
+                'message' => 'Error updating visit service',
+                'data' => $data,
+                'errors' => $this->visitServiceModel->errors(),
+            ]);
+        }
 
         return $this->response->setJSON([
             'status' => 'success',
             'message' => 'Visit service updated',
-            'data' => $this->visitServiceModel->findWithDetails($id),
+            'data' => $this->visitServiceModel->findWithDetails((int) $id),
             'errors' => '-',
         ]);
     }
