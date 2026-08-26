@@ -116,6 +116,7 @@ class VisitServiceModel extends Model
             v.id AS visit_id,
             v.visit_date,
             v.visit_status,
+            v.queue_number,
             vs.visit_service_id,
             vs.service_id,
             ms.service_name
