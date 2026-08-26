@@ -24,6 +24,7 @@ class VisitController extends ResourceController
         $visitDate   = trim((string) $this->request->getGet('visit_date') ?? '');
         $patientName = trim((string) $this->request->getGet('patient_name') ?? '');
         $visitStatus = trim((string) $this->request->getGet('visit_status') ?? '');
+        $queueNumber = trim((string) $this->request->getGet('queue_number') ?? '');
 
         if ($patientId !== '') {
             $this->visitModel->where('patient_id', $patientId);
@@ -36,6 +37,9 @@ class VisitController extends ResourceController
         }
         if ($visitStatus !== '') {
             $this->visitModel->where('visit_status', $visitStatus);
+        }
+        if ($queueNumber !== '') {
+            $this->visitModel->where('visits.queue_number', $queueNumber);
         }
 
         $visits = $this->visitModel->getPaginatedWithPatient($perPage, $page);
@@ -76,6 +80,7 @@ class VisitController extends ResourceController
         $visitDate   = trim((string) $this->request->getGet('visit_date') ?? '');
         $patientName = trim((string) $this->request->getGet('patient_name') ?? '');
         $visitStatus = trim((string) $this->request->getGet('visit_status') ?? '');
+        $queueNumber = trim((string) $this->request->getGet('queue_number') ?? '');
 
         if ($patientId !== '') {
             $this->visitModel->where('patient_id', $patientId);
@@ -88,6 +93,9 @@ class VisitController extends ResourceController
         }
         if ($visitStatus !== '') {
             $this->visitModel->where('visit_status', $visitStatus);
+        }
+        if ($queueNumber !== '') {
+            $this->visitModel->where('visits.queue_number', $queueNumber);
         }
 
         $visits = $this->visitModel->getPaginatedByParentWithPatient((int) $parentId, $perPage, $page);
@@ -129,6 +137,28 @@ class VisitController extends ResourceController
     public function create()
     {
         $data = $this->request->getJSON(true);
+        if (!is_array($data)) {
+            $data = [];
+        }
+
+        // normalize visit_date (DB defaults to CURRENT_DATE but we need it for queue calc)
+        $visitDate = isset($data['visit_date']) ? trim((string) $data['visit_date']) : '';
+        if ($visitDate === '') {
+            $visitDate = date('Y-m-d');
+            $data['visit_date'] = $visitDate;
+        }
+
+        // auto-generate queue_number, ignore client value
+        $next = $this->visitModel->nextQueueNumber($visitDate);
+        if ($next === null) {
+            return $this->response->setStatusCode(400)->setJSON([
+                'status' => 'failed',
+                'message' => 'Queue full for this date (max 99)',
+                'data' => $data,
+                'errors' => 'queue_full',
+            ]);
+        }
+        $data['queue_number'] = $next;
 
         $inserted = $this->visitModel->insert($data);
         if ($inserted === false) {
@@ -151,6 +181,11 @@ class VisitController extends ResourceController
     public function update($id = null)
     {
         $data = $this->request->getJSON(true);
+        if (!is_array($data)) {
+            $data = [];
+        }
+        // queue_number is auto-generated and immutable
+        unset($data['queue_number']);
 
         $visit = $this->visitModel->find($id);
 

@@ -16,17 +16,34 @@ class VisitModel extends Model
         'patient_id',
         'visit_date',
         'visit_status',
+        'queue_number',
     ];
 
     protected $useTimestamps = false;
 
     protected $validationRules = [
-        'patient_id' => 'required|integer',
-        'visit_date' => 'permit_empty|valid_date',
+        'patient_id'   => 'required|integer',
+        'visit_date'   => 'permit_empty|valid_date',
+        'queue_number' => 'permit_empty|max_length[10]',
     ];
 
     protected $validationMessages = [];
     protected $skipValidation = false;
+
+    /**
+     * Generate next queue number RPG-01..RPG-99 for given date.
+     * Returns null when quota 99 reached.
+     * ponytail: COUNT+1 is race-prone without FOR UPDATE; add row lock if needed.
+     */
+    public function nextQueueNumber(string $date): ?string
+    {
+        $count = $this->where('visit_date', $date)->countAllResults();
+        if ($count >= 99) {
+            return null;
+        }
+
+        return sprintf('RPG-%02d', $count + 1);
+    }
 
     /*
     |--------------------------------------------------------------------------

@@ -28,7 +28,7 @@ class RateLimiterFilter implements FilterInterface
     {
         $throttler = Services::throttler();
 
-        $key = $request->getIPAddress();
+        $key = str_replace(':', '_', $request->getIPAddress());
         // 10 requests in a minute
         if (! $throttler->check($key, 10, MINUTE)) {
             return Services::response()
