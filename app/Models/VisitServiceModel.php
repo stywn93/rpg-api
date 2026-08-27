@@ -119,6 +119,7 @@ class VisitServiceModel extends Model
             v.queue_number,
             vs.visit_service_id,
             vs.service_id,
+            vs.result,
             ms.service_name
             ";
 
