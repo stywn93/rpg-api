@@ -1,13 +1,25 @@
 services:
-  codeigniter4:
-    image: shinsenter/codeigniter4:latest
-    container_name: rpg-api
+  web:
+    build: ../rpg-online
+    container_name: rpg-online
     ports:
       - "80:80"
-      - "443:443"
-      - "443:443/udp"
+    depends_on:
+      - app
+    restart: unless-stopped
+    networks:
+      - rpg-api-network
+
+  app:
+    build: .
+    container_name: rpg-api
+    ports:
+      - "8080:80"
     volumes:
-      - .:/var/www/html
+      - ./writable:/var/www/html/writable
+    depends_on:
+      db:
+        condition: service_healthy
     restart: unless-stopped
     networks:
       - rpg-api-network
@@ -24,13 +36,18 @@ services:
       - db_data:/var/lib/mysql
     ports:
       - "3306:3306"
-    restart: no
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-proot"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
     networks:
       - rpg-api-network
 
 volumes:
- db_data:
+  db_data:
 
 networks:
- rpg-api-network:
-  driver: bridge
+  rpg-api-network:
+    driver: bridge

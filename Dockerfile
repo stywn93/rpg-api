@@ -1,4 +1,4 @@
-FROM php:8.5.3-apache
+FROM php:8.4-apache
 
 # Install ekstensi PHP yang dibutuhkan
 RUN apt-get update && apt-get install -y \
@@ -27,9 +27,11 @@ WORKDIR /var/www/html
 
 # Copy project files
 COPY . /var/www/html
-COPY .env .env.example
 
-# Install dependencies (uncomment jika sudah ada composer.json)
+# Fallback .env dari env.example untuk build di server (clone tanpa .env)
+RUN if [ ! -f .env ] && [ -f env.example ]; then cp env.example .env; fi
+
+# Install dependencies
 RUN composer install --no-dev --optimize-autoloader
 #
 ## Configure Apache DocumentRoot untuk CodeIgniter 4
@@ -55,4 +57,4 @@ RUN chmod -R 777 /var/www/html/writable
 # Expose port
 EXPOSE 80
 
-#CMD ["apache2-foreground"]
+CMD ["apache2-foreground"]
