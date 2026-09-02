@@ -1,46 +1,40 @@
 services:
-  web:
-    build: ../rpg-online
-    container_name: rpg-online
-    ports:
-      - "80:80"
-    depends_on:
-      - app
-    restart: unless-stopped
-    networks:
-      - rpg-api-network
-
-  app:
-    build: .
+  frontend:
+      build:
+        context: ../rpg-online
+      container_name: rpg-frontend
+      ports:
+        - "8082:80"
+      depends_on:
+        - codeigniter4
+      restart: unless-stopped
+      networks:
+        - rpg-api-network
+  codeigniter4:
+    image: shinsenter/codeigniter4:php8.4-apache   # pin versi
     container_name: rpg-api
     ports:
-      - "8080:80"
+      - "80:80"
+      - "443:443"
     volumes:
-      - ./writable:/var/www/html/writable
-    depends_on:
-      db:
-        condition: service_healthy
+      - .:/var/www/html
     restart: unless-stopped
+    depends_on:
+      - db
+    env_file:
+      - .env
     networks:
       - rpg-api-network
 
   db:
     image: mysql:8.0
     container_name: rpg-api-db
-    environment:
-      MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: db
-      MYSQL_USER: user
-      MYSQL_PASSWORD: pass
+    env_file:
+      - .env
     volumes:
       - db_data:/var/lib/mysql
     ports:
-      - "3306:3306"
-    healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-proot"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
+      - "127.0.0.1:3306:3306"   # bind ke localhost saja
     restart: unless-stopped
     networks:
       - rpg-api-network
